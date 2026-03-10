@@ -60,12 +60,20 @@ class SuratView extends StatelessWidget {
                         // Teks Judul
                         const Text(
                           "Layanan Surat",
-                          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           "Ajukan permohonan surat secara online",
-                          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
@@ -86,16 +94,32 @@ class SuratView extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: const Color(0xFFF3F4F6)),
+                              border: Border.all(
+                                color: const Color(0xFFF3F4F6),
+                              ),
                               boxShadow: [
-                                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 4)),
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 4),
+                                ),
                               ],
                             ),
                             child: const Row(
                               children: [
-                                Icon(Icons.search, color: Color(0xFF9CA3AF), size: 20),
+                                Icon(
+                                  Icons.search,
+                                  color: Color(0xFF9CA3AF),
+                                  size: 20,
+                                ),
                                 SizedBox(width: 12),
-                                Text("Cari jenis surat...", style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 14)),
+                                Text(
+                                  "Cari jenis surat...",
+                                  style: TextStyle(
+                                    color: Color(0xFF9CA3AF),
+                                    fontSize: 14,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -109,10 +133,17 @@ class SuratView extends StatelessWidget {
                             color: primaryRed,
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 6, offset: const Offset(0, 4)),
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 6,
+                                offset: const Offset(0, 4),
+                              ),
                             ],
                           ),
-                          child: const Icon(Icons.filter_list, color: Colors.white),
+                          child: const Icon(
+                            Icons.filter_list,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -131,25 +162,64 @@ class SuratView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Kategori Surat", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textDark)),
+                  const Text(
+                    "Kategori Surat",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: textDark,
+                    ),
+                  ),
                   const SizedBox(height: 16),
-                  
+
                   // Baris 1
                   Row(
                     children: [
-                      Expanded(child: _buildCategoryCard(Icons.description, const Color(0xFF2563EB), const Color(0xFFEFF6FF), "Administrasi", "KK, KTP, Akta")),
+                      Expanded(
+                        child: _buildCategoryCard(
+                          Icons.description,
+                          const Color(0xFF2563EB),
+                          const Color(0xFFEFF6FF),
+                          "Administrasi",
+                          "KK, KTP, Akta",
+                        ),
+                      ),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildCategoryCard(Icons.domain, const Color(0xFFEA580C), const Color(0xFFFFF7ED), "Perizinan", "Usaha, Bangunan")),
+                      Expanded(
+                        child: _buildCategoryCard(
+                          Icons.domain,
+                          const Color(0xFFEA580C),
+                          const Color(0xFFFFF7ED),
+                          "Perizinan",
+                          "Usaha, Bangunan",
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Baris 2
                   Row(
                     children: [
-                      Expanded(child: _buildCategoryCard(Icons.volunteer_activism, const Color(0xFF9333EA), const Color(0xFFFAF5FF), "Keterangan", "Tidak Mampu, Domisili")),
+                      Expanded(
+                        child: _buildCategoryCard(
+                          Icons.volunteer_activism,
+                          const Color(0xFF9333EA),
+                          const Color(0xFFFAF5FF),
+                          "Keterangan",
+                          "Tidak Mampu, Domisili",
+                        ),
+                      ),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildCategoryCard(Icons.gavel, const Color(0xFF16A34A), const Color(0xFFF0FDF4), "Hukum", "Ahli Waris, Tanah")),
+                      Expanded(
+                        child: _buildCategoryCard(
+                          Icons.gavel,
+                          const Color(0xFF16A34A),
+                          const Color(0xFFF0FDF4),
+                          "Hukum",
+                          "Ahli Waris, Tanah",
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -166,51 +236,36 @@ class SuratView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Paling Sering Diakses", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textDark)),
+                  const Text(
+                    "Paling Sering Diakses",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: textDark,
+                    ),
+                  ),
                   const SizedBox(height: 16),
-                  _buildPopularItem(Icons.home, "Surat Keterangan Domisili", "Administrasi Kependudukan"),
+                  _buildPopularItem(
+                    Icons.home,
+                    "Surat Keterangan Domisili",
+                    "Administrasi Kependudukan",
+                  ),
                   const SizedBox(height: 12),
-                  _buildPopularItem(Icons.storefront, "Surat Izin Usaha Mikro", "Perizinan Usaha"),
+                  _buildPopularItem(
+                    Icons.storefront,
+                    "Surat Izin Usaha Mikro",
+                    "Perizinan Usaha",
+                  ),
                   const SizedBox(height: 12),
-                  _buildPopularItem(Icons.family_restroom, "Surat Keterangan Kelahiran", "Pencatatan Sipil"),
+                  _buildPopularItem(
+                    Icons.family_restroom,
+                    "Surat Keterangan Kelahiran",
+                    "Pencatatan Sipil",
+                  ),
                 ],
               ),
             ),
           ],
-        ),
-      ),
-
-      // ==========================================
-      // FLOATING ACTION BUTTON (KAMERA)
-      // ==========================================
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: goldColor,
-        shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 4)),
-        elevation: 6,
-        child: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-      // ==========================================
-      // BOTTOM NAVIGATION BAR (Surat Aktif)
-      // ==========================================
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: SizedBox(
-          height: 65,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildBottomNavItem(Icons.home, "Home", false),
-              _buildBottomNavItem(Icons.mail, "Surat", true), // STATUS AKTIF DI SINI
-              const SizedBox(width: 48), // Ruang kosong untuk kamera
-              _buildBottomNavItem(Icons.history, "Aktivitas", false),
-              _buildBottomNavItem(Icons.person, "Profil", false),
-            ],
-          ),
         ),
       ),
     );
@@ -231,7 +286,13 @@ class SuratView extends StatelessWidget {
   }
 
   // Kotak Kategori (Grid)
-  Widget _buildCategoryCard(IconData icon, Color iconColor, Color bgColor, String title, String subtitle) {
+  Widget _buildCategoryCard(
+    IconData icon,
+    Color iconColor,
+    Color bgColor,
+    String title,
+    String subtitle,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -239,7 +300,11 @@ class SuratView extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFF9FAFB)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 4, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -247,11 +312,21 @@ class SuratView extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Icon(icon, color: iconColor, size: 20),
           ),
           const SizedBox(height: 12),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: textDark)),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: textDark,
+            ),
+          ),
           const SizedBox(height: 4),
           Text(subtitle, style: const TextStyle(color: textGray, fontSize: 10)),
         ],
@@ -268,7 +343,11 @@ class SuratView extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFF3F4F6)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 4, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Row(
@@ -276,7 +355,10 @@ class SuratView extends StatelessWidget {
           // Ikon Merah Muda
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(color: Color(0xFFFEF2F2), shape: BoxShape.circle),
+            decoration: const BoxDecoration(
+              color: Color(0xFFFEF2F2),
+              shape: BoxShape.circle,
+            ),
             child: Icon(icon, color: const Color(0xFF991B1B), size: 20),
           ),
           const SizedBox(width: 16),
@@ -285,9 +367,19 @@ class SuratView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: textDark)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: textDark,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(color: textGray, fontSize: 11)),
+                Text(
+                  subtitle,
+                  style: const TextStyle(color: textGray, fontSize: 11),
+                ),
               ],
             ),
           ),
@@ -297,34 +389,4 @@ class SuratView extends StatelessWidget {
       ),
     );
   }
-
-  // Item Bottom Navigation (Berubah jadi pill merah kalau aktif)
-  Widget _buildBottomNavItem(IconData icon, String label, bool isActive) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (isActive)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: primaryRed.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                Icon(icon, color: primaryRed, size: 20),
-                const SizedBox(width: 4),
-                Text(label, style: const TextStyle(color: primaryRed, fontSize: 10, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          )
-        else ...[
-          Icon(icon, color: const Color(0xFF9CA3AF), size: 20),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 10, fontWeight: FontWeight.w500)),
-        ],
-      ],
-    );
-  }
-} 
+}

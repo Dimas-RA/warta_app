@@ -4,7 +4,7 @@ import '../home/home_view.dart';
 import '../surat/surat_view.dart';
 import '../aktivitas/aktivitas_view.dart';
 import '../profil/profil_view.dart';
-import '../report/lapor_view.dart'; 
+import '../report/lapor_view.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -19,11 +19,11 @@ class _MainViewState extends State<MainView> {
 
   // Daftar halaman yang akan ditampilkan sesuai urutan tab
   final List<Widget> _pages = [
-    const HomeView(),      // Index 0
-    const SuratView(),     // Index 1
-    const SizedBox(),      // Index 2 (Dikosongkan karena ini area tombol Kamera)
+    const HomeView(), // Index 0
+    const SuratView(), // Index 1
+    const SizedBox(), // Index 2 (Dikosongkan karena ini area tombol Kamera)
     const AktivitasView(), // Index 3
-    const ProfilView(),    // Index 4
+    const ProfilView(), // Index 4
   ];
 
   @override
@@ -35,7 +35,7 @@ class _MainViewState extends State<MainView> {
         return Scaffold(
           // Menampilkan halaman sesuai index yang aktif di ViewModel
           body: _pages[_viewModel.currentIndex],
-          
+
           // Tombol Kamera (E-Report) melayang di tengah
           floatingActionButton: FloatingActionButton(
             onPressed: () {
@@ -46,11 +46,14 @@ class _MainViewState extends State<MainView> {
               );
             },
             backgroundColor: const Color(0xFFD4AF37),
-            shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 4)),
+            shape: const CircleBorder(
+              side: BorderSide(color: Colors.white, width: 4),
+            ),
             elevation: 6,
             child: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
           ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
 
           // Bottom Navigation Bar WARTA
           bottomNavigationBar: BottomAppBar(
@@ -76,35 +79,41 @@ class _MainViewState extends State<MainView> {
     );
   }
 
-  // Fungsi pembuat tombol Navigasi Bawah
+  // Fungsi pembuat tombol Navigasi Bawah (Anti-Goyang)
   Widget _buildBottomNavItem(IconData icon, String label, int index) {
     final isActive = _viewModel.currentIndex == index;
     final primaryRed = const Color(0xFF8B0000);
+    final greyColor = const Color(0xFF9CA3AF);
 
     return InkWell(
       onTap: () => _viewModel.setIndex(index), // Mengubah state via ViewModel
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (isActive)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(color: primaryRed.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-              child: Row(
-                children: [
-                  Icon(icon, color: primaryRed, size: 20),
-                  const SizedBox(width: 4),
-                  Text(label, style: TextStyle(color: primaryRed, fontSize: 10, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            )
-          else ...[
-            Icon(icon, color: const Color(0xFF9CA3AF), size: 20),
+      borderRadius: BorderRadius.circular(16), // Efek klik melengkung
+      child: Container(
+        width: 65, // KUNCI UTAMA: Lebar tetap agar tidak mendorong ikon lain
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        decoration: BoxDecoration(
+          // Munculkan background merah transparan hanya saat aktif
+          color: isActive ? primaryRed.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Posisi Ikon selalu di atas
+            Icon(icon, color: isActive ? primaryRed : greyColor, size: 24),
             const SizedBox(height: 4),
-            Text(label, style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 10, fontWeight: FontWeight.w500)),
+            // Posisi Teks selalu di bawah
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive ? primaryRed : greyColor,
+                fontSize: 10,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+              ),
+            ),
           ],
-        ],
+        ),
       ),
     );
   }

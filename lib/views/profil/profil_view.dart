@@ -48,7 +48,11 @@ class ProfilView extends StatelessWidget {
                     children: [
                       const Text(
                         "Profil Saya",
-                        style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Container(
                         padding: const EdgeInsets.all(8),
@@ -56,7 +60,11 @@ class ProfilView extends StatelessWidget {
                           color: Colors.white.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.settings, color: Colors.white, size: 20),
+                        child: const Icon(
+                          Icons.settings,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ],
                   ),
@@ -82,7 +90,11 @@ class ProfilView extends StatelessWidget {
                             ),
                             child: const CircleAvatar(
                               backgroundColor: Colors.white,
-                              child: Icon(Icons.person, size: 40, color: Colors.grey),
+                              child: Icon(
+                                Icons.person,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
                               // backgroundImage: AssetImage('assets/images/user.jpg'), // Gunakan jika ada gambar
                             ),
                           ),
@@ -108,28 +120,48 @@ class ProfilView extends StatelessWidget {
                         children: [
                           const Text(
                             "Ahmad Syarifuddin",
-                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             "NIK: 3174*********0001",
-                            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12),
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 12,
+                            ),
                           ),
                           const SizedBox(height: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: goldColor.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: goldColor.withOpacity(0.5)),
+                              border: Border.all(
+                                color: goldColor.withOpacity(0.5),
+                              ),
                             ),
                             child: const Row(
                               children: [
-                                Icon(Icons.verified_user, color: goldColor, size: 12),
+                                Icon(
+                                  Icons.verified_user,
+                                  color: goldColor,
+                                  size: 12,
+                                ),
                                 SizedBox(width: 4),
                                 Text(
                                   "TERVERIFIKASI",
-                                  style: TextStyle(color: goldColor, fontSize: 10, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    color: goldColor,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
@@ -155,7 +187,11 @@ class ProfilView extends StatelessWidget {
                       ),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 15, offset: const Offset(0, 10)),
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 15,
+                          offset: const Offset(0, 10),
+                        ),
                       ],
                     ),
                     child: Column(
@@ -167,30 +203,69 @@ class ProfilView extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.shield, color: goldColor, size: 30), // Placeholder Garuda
+                                const Icon(
+                                  Icons.shield,
+                                  color: goldColor,
+                                  size: 30,
+                                ), // Placeholder Garuda
                                 const SizedBox(width: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: const [
-                                    Text("REPUBLIK INDONESIA", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                                    Text("KARTU TANDA PENDUDUK", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    Text(
+                                      "REPUBLIK INDONESIA",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      "KARTU TANDA PENDUDUK",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: const Text("PROVINSI DKI\nJAKARTA", style: TextStyle(color: Colors.white, fontSize: 8), textAlign: TextAlign.center),
+                              child: const Text(
+                                "PROVINSI DKI\nJAKARTA",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 20),
-                        const Text("NOMOR INDUK KEPENDUDUKAN", style: TextStyle(color: Colors.white70, fontSize: 9)),
-                        const Text("3174 0524 0991 0001", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                        const Text(
+                          "NOMOR INDUK KEPENDUDUKAN",
+                          style: TextStyle(color: Colors.white70, fontSize: 9),
+                        ),
+                        const Text(
+                          "3174 0524 0991 0001",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
                         const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -201,16 +276,42 @@ class ProfilView extends StatelessWidget {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: const [
-                                    Text("TEMPAT/TGL LAHIR", style: TextStyle(color: Colors.white70, fontSize: 8)),
-                                    Text("JAKARTA, 24-09-1991", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                                    Text(
+                                      "TEMPAT/TGL LAHIR",
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 8,
+                                      ),
+                                    ),
+                                    Text(
+                                      "JAKARTA, 24-09-1991",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(width: 16),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: const [
-                                    Text("JENIS KELAMIN", style: TextStyle(color: Colors.white70, fontSize: 8)),
-                                    Text("LAKI-LAKI", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                                    Text(
+                                      "JENIS KELAMIN",
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 8,
+                                      ),
+                                    ),
+                                    Text(
+                                      "LAKI-LAKI",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -219,8 +320,17 @@ class ProfilView extends StatelessWidget {
                             Container(
                               width: 50,
                               height: 50,
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
-                              child: const Center(child: Icon(Icons.qr_code_2, color: Colors.black, size: 40)),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.qr_code_2,
+                                  color: Colors.black,
+                                  size: 40,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -237,10 +347,30 @@ class ProfilView extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildQuickAction(Icons.account_balance_wallet, const Color(0xFF8B0000), const Color(0xFFFEF2F2), "Dompet"),
-                      _buildQuickAction(Icons.receipt_long, const Color(0xFF3B82F6), const Color(0xFFEFF6FF), "Riwayat"),
-                      _buildQuickAction(Icons.star, const Color(0xFFD97706), const Color(0xFFFEF3C7), "Poin"),
-                      _buildQuickAction(Icons.help_outline, const Color(0xFF16A34A), const Color(0xFFDCFCE7), "Bantuan"),
+                      _buildQuickAction(
+                        Icons.account_balance_wallet,
+                        const Color(0xFF8B0000),
+                        const Color(0xFFFEF2F2),
+                        "Dompet",
+                      ),
+                      _buildQuickAction(
+                        Icons.receipt_long,
+                        const Color(0xFF3B82F6),
+                        const Color(0xFFEFF6FF),
+                        "Riwayat",
+                      ),
+                      _buildQuickAction(
+                        Icons.star,
+                        const Color(0xFFD97706),
+                        const Color(0xFFFEF3C7),
+                        "Poin",
+                      ),
+                      _buildQuickAction(
+                        Icons.help_outline,
+                        const Color(0xFF16A34A),
+                        const Color(0xFFDCFCE7),
+                        "Bantuan",
+                      ),
                     ],
                   ),
                 ),
@@ -253,7 +383,15 @@ class ProfilView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("AKUN & KEAMANAN", style: TextStyle(color: textGray, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                      const Text(
+                        "AKUN & KEAMANAN",
+                        style: TextStyle(
+                          color: textGray,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
                       const SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
@@ -263,11 +401,22 @@ class ProfilView extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
-                            _buildMenuItem(Icons.person_outline, "Informasi Pribadi"),
+                            _buildMenuItem(
+                              Icons.person_outline,
+                              "Informasi Pribadi",
+                            ),
                             const Divider(height: 1, color: borderColor),
-                            _buildMenuItem(Icons.lock_outline, "Ubah PIN Keamanan"),
+                            _buildMenuItem(
+                              Icons.lock_outline,
+                              "Ubah PIN Keamanan",
+                            ),
                             const Divider(height: 1, color: borderColor),
-                            _buildMenuItem(Icons.fingerprint, "Biometrik Login", subtitle: "Gunakan Face ID atau Sidik Jari", isSwitch: true),
+                            _buildMenuItem(
+                              Icons.fingerprint,
+                              "Biometrik Login",
+                              subtitle: "Gunakan Face ID atau Sidik Jari",
+                              isSwitch: true,
+                            ),
                           ],
                         ),
                       ),
@@ -283,7 +432,15 @@ class ProfilView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("LAINNYA", style: TextStyle(color: textGray, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                      const Text(
+                        "LAINNYA",
+                        style: TextStyle(
+                          color: textGray,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
                       const SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
@@ -293,9 +450,16 @@ class ProfilView extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
-                            _buildMenuItem(Icons.description_outlined, "Syarat & Ketentuan"),
+                            _buildMenuItem(
+                              Icons.description_outlined,
+                              "Syarat & Ketentuan",
+                            ),
                             const Divider(height: 1, color: borderColor),
-                            _buildMenuItem(Icons.logout, "Keluar dari Aplikasi", isLogout: true),
+                            _buildMenuItem(
+                              Icons.logout,
+                              "Keluar dari Aplikasi",
+                              isLogout: true,
+                            ),
                           ],
                         ),
                       ),
@@ -307,43 +471,19 @@ class ProfilView extends StatelessWidget {
 
                 // --- VERSI APLIKASI ---
                 const Center(
-                  child: Text("WARTA APP v2.4.0", style: TextStyle(color: textGray, fontSize: 10, letterSpacing: 1)),
+                  child: Text(
+                    "WARTA APP v2.4.0",
+                    style: TextStyle(
+                      color: textGray,
+                      fontSize: 10,
+                      letterSpacing: 1,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],
             ),
           ],
-        ),
-      ),
-
-      // ==========================================
-      // FLOATING ACTION BUTTON & BOTTOM NAV
-      // ==========================================
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: goldColor,
-        shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 4)),
-        elevation: 6,
-        child: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: SizedBox(
-          height: 65,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildBottomNavItem(Icons.home, "Home", false),
-              _buildBottomNavItem(Icons.mail, "Surat", false),
-              const SizedBox(width: 48), // Ruang Kamera
-              _buildBottomNavItem(Icons.history, "Aktivitas", false), 
-              _buildBottomNavItem(Icons.person, "Profil", true), // TAB AKTIF
-            ],
-          ),
         ),
       ),
     );
@@ -352,23 +492,44 @@ class ProfilView extends StatelessWidget {
   // --- WIDGET HELPER ---
 
   // Tombol Aksi Cepat (Bulat)
-  Widget _buildQuickAction(IconData icon, Color iconColor, Color bgColor, String label) {
+  Widget _buildQuickAction(
+    IconData icon,
+    Color iconColor,
+    Color bgColor,
+    String label,
+  ) {
     return Column(
       children: [
         Container(
           width: 50,
           height: 50,
-          decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Icon(icon, color: iconColor, size: 24),
         ),
         const SizedBox(height: 8),
-        Text(label, style: const TextStyle(color: textDark, fontSize: 11, fontWeight: FontWeight.w600)),
+        Text(
+          label,
+          style: const TextStyle(
+            color: textDark,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
 
   // Baris Menu List (ListTile Custom)
-  Widget _buildMenuItem(IconData icon, String title, {String? subtitle, bool isSwitch = false, bool isLogout = false}) {
+  Widget _buildMenuItem(
+    IconData icon,
+    String title, {
+    String? subtitle,
+    bool isSwitch = false,
+    bool isLogout = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Row(
@@ -376,10 +537,16 @@ class ProfilView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: isLogout ? primaryRed.withOpacity(0.1) : const Color(0xFFFEF2F2),
+              color: isLogout
+                  ? primaryRed.withOpacity(0.1)
+                  : const Color(0xFFFEF2F2),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: isLogout ? primaryRed : primaryRed, size: 18),
+            child: Icon(
+              icon,
+              color: isLogout ? primaryRed : primaryRed,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -396,8 +563,11 @@ class ProfilView extends StatelessWidget {
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 2),
-                  Text(subtitle, style: const TextStyle(color: textGray, fontSize: 10)),
-                ]
+                  Text(
+                    subtitle,
+                    style: const TextStyle(color: textGray, fontSize: 10),
+                  ),
+                ],
               ],
             ),
           ),
@@ -412,33 +582,6 @@ class ProfilView extends StatelessWidget {
             const Icon(Icons.chevron_right, color: textGray, size: 20),
         ],
       ),
-    );
-  }
-
-  // Item Bottom Navigation
-  Widget _buildBottomNavItem(IconData icon, String label, bool isActive) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (isActive)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(color: primaryRed.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-            child: Row(
-              children: [
-                Icon(icon, color: primaryRed, size: 20),
-                const SizedBox(width: 4),
-                Text(label, style: const TextStyle(color: primaryRed, fontSize: 10, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          )
-        else ...[
-          Icon(icon, color: const Color(0xFF9CA3AF), size: 20),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 10, fontWeight: FontWeight.w500)),
-        ],
-      ],
     );
   }
 }

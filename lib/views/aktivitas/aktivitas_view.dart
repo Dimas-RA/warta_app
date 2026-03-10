@@ -5,7 +5,9 @@ class AktivitasView extends StatelessWidget {
 
   // Warna Konsisten WARTA
   static const Color primaryRed = Color(0xFF8B0000);
-  static const Color primaryRedDark = Color(0xFFB10000); // Merah untuk tombol aktif
+  static const Color primaryRedDark = Color(
+    0xFFB10000,
+  ); // Merah untuk tombol aktif
   static const Color bgApp = Color(0xFFF8FAFC);
   static const Color textDark = Color(0xFF0F172A);
   static const Color textGray = Color(0xFF64748B);
@@ -60,12 +62,20 @@ class AktivitasView extends StatelessWidget {
                       children: [
                         const Text(
                           "Aktivitas Saya",
-                          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           "Pantau status pengajuan dan laporan Anda",
-                          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
@@ -101,10 +111,15 @@ class AktivitasView extends StatelessWidget {
                 children: [
                   const Text(
                     "HARI INI",
-                    style: TextStyle(color: textLightGray, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1),
+                    style: TextStyle(
+                      color: textLightGray,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1,
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Item 1: Verifikasi E-KTP (Berhasil)
                   _buildActivityCard(
                     icon: Icons.check_circle,
@@ -150,10 +165,15 @@ class AktivitasView extends StatelessWidget {
                 children: [
                   const Text(
                     "KEMARIN",
-                    style: TextStyle(color: textLightGray, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1),
+                    style: TextStyle(
+                      color: textLightGray,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1,
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Item 3: Pengajuan KK Baru (Ditolak)
                   _buildActivityCard(
                     icon: Icons.cancel,
@@ -172,7 +192,8 @@ class AktivitasView extends StatelessWidget {
 
                   // Item 4: Laporan Jalan Rusak (Selesai/Berhasil)
                   _buildActivityCard(
-                    icon: Icons.campaign, // Menggunakan ikon pengeras suara seperti di desain
+                    icon: Icons
+                        .campaign, // Menggunakan ikon pengeras suara seperti di desain
                     iconColor: const Color(0xFFF97316), // Oranye
                     iconBg: const Color(0xFFFFF7ED),
                     title: "Laporan Jalan Rusak",
@@ -187,37 +208,6 @@ class AktivitasView extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-
-      // ==========================================
-      // FLOATING ACTION BUTTON & BOTTOM NAV
-      // ==========================================
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: goldColor,
-        shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 4)),
-        elevation: 6,
-        child: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: SizedBox(
-          height: 65,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildBottomNavItem(Icons.home, "Home", false),
-              _buildBottomNavItem(Icons.mail, "Surat", false),
-              const SizedBox(width: 48), // Ruang Kamera
-              _buildBottomNavItem(Icons.history, "Aktivitas", true), // TAB AKTIF DI SINI
-              _buildBottomNavItem(Icons.person, "Profil", false),
-            ],
-          ),
         ),
       ),
     );
@@ -237,7 +227,13 @@ class AktivitasView extends StatelessWidget {
           border: isActive ? null : Border.all(color: borderColor),
           boxShadow: isActive
               ? null
-              : [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         alignment: Alignment.center,
         child: Text(
@@ -274,7 +270,11 @@ class AktivitasView extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 4, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -286,7 +286,10 @@ class AktivitasView extends StatelessWidget {
               // Ikon
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Icon(icon, color: iconColor, size: 24),
               ),
               const SizedBox(width: 16),
@@ -295,23 +298,41 @@ class AktivitasView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textDark)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: textDark,
+                      ),
+                    ),
                     const SizedBox(height: 2),
-                    Text(subtitle, style: const TextStyle(color: textGray, fontSize: 12)),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(color: textGray, fontSize: 12),
+                    ),
                     if (customContent != null) ...[
                       const SizedBox(height: 12),
                       customContent,
-                    ]
+                    ],
                   ],
                 ),
               ),
               // Label Status (Kanan Atas)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(
+                  color: statusBg,
+                  borderRadius: BorderRadius.circular(4),
+                ),
                 child: Text(
                   status,
-                  style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
             ],
@@ -323,7 +344,14 @@ class AktivitasView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(time, style: const TextStyle(color: textLightGray, fontSize: 11, fontWeight: FontWeight.w500)),
+              Text(
+                time,
+                style: const TextStyle(
+                  color: textLightGray,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               Text(
                 actionText,
                 style: TextStyle(
@@ -350,13 +378,24 @@ class AktivitasView extends StatelessWidget {
         const SizedBox(width: 4),
         _buildStepCircle("3"),
         const SizedBox(width: 8),
-        const Text("Tahap Verifikasi Berkas", style: TextStyle(color: textLightGray, fontSize: 10, fontWeight: FontWeight.w500)),
+        const Text(
+          "Tahap Verifikasi Berkas",
+          style: TextStyle(
+            color: textLightGray,
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ],
     );
   }
 
   // Lingkaran kecil untuk tahap proses
-  Widget _buildStepCircle(String step, {bool isDone = false, bool isCurrent = false}) {
+  Widget _buildStepCircle(
+    String step, {
+    bool isDone = false,
+    bool isCurrent = false,
+  }) {
     Color bgColor = const Color(0xFFF1F5F9); // Abu-abu (Default)
     Color textColor = textLightGray;
 
@@ -373,34 +412,14 @@ class AktivitasView extends StatelessWidget {
       height: 20,
       alignment: Alignment.center,
       decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
-      child: Text(step, style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.bold)),
-    );
-  }
-
-  // Item Bottom Navigation
-  Widget _buildBottomNavItem(IconData icon, String label, bool isActive) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (isActive)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(color: primaryRed.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-            child: Row(
-              children: [
-                Icon(icon, color: primaryRed, size: 20),
-                const SizedBox(width: 4),
-                Text(label, style: const TextStyle(color: primaryRed, fontSize: 10, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          )
-        else ...[
-          Icon(icon, color: const Color(0xFF9CA3AF), size: 20),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 10, fontWeight: FontWeight.w500)),
-        ],
-      ],
+      child: Text(
+        step,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }

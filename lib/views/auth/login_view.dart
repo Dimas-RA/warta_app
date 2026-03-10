@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../main/main_view.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -19,7 +20,8 @@ class LoginView extends StatelessWidget {
           children: [
             // 1. BACKGROUND MERAH DENGAN LENGKUNGAN (Gradient)
             Container(
-              height: 320, // Dibuat sedikit lebih tinggi agar tertutup kotak putih
+              height:
+                  320, // Dibuat sedikit lebih tinggi agar tertutup kotak putih
               width: double.infinity,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -39,7 +41,11 @@ class LoginView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(height: 20),
-                  Image(image: AssetImage('assets/images/warta_logo.png'), width: 80,height: 80,),
+                  Image(
+                    image: AssetImage('assets/images/warta_logo.png'),
+                    width: 80,
+                    height: 80,
+                  ),
                   SizedBox(height: 8),
                   Text(
                     "WARTA",
@@ -50,7 +56,9 @@ class LoginView extends StatelessWidget {
                       letterSpacing: 3,
                     ),
                   ),
-                  SizedBox(height: 40), // Jarak tambahan karena ditimpa kotak putih
+                  SizedBox(
+                    height: 40,
+                  ), // Jarak tambahan karena ditimpa kotak putih
                 ],
               ),
             ),
@@ -86,17 +94,28 @@ class LoginView extends StatelessWidget {
                     // Input Email
                     TextField(
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.email, color: Color(0xFF8B0000)),
+                        prefixIcon: const Icon(
+                          Icons.email,
+                          color: Color(0xFF8B0000),
+                        ),
                         hintText: "Email/Username",
-                        hintStyle: const TextStyle(color: textGray, fontSize: 16),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 18),
+                        hintStyle: const TextStyle(
+                          color: textGray,
+                          fontSize: 16,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 18,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(color: borderColor),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFF8B0000), width: 2),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF8B0000),
+                            width: 2,
+                          ),
                         ),
                       ),
                     ),
@@ -106,18 +125,32 @@ class LoginView extends StatelessWidget {
                     TextField(
                       obscureText: true,
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock, color: Color(0xFF8B0000)),
-                        suffixIcon: const Icon(Icons.visibility, color: textGray),
+                        prefixIcon: const Icon(
+                          Icons.lock,
+                          color: Color(0xFF8B0000),
+                        ),
+                        suffixIcon: const Icon(
+                          Icons.visibility,
+                          color: textGray,
+                        ),
                         hintText: "Password",
-                        hintStyle: const TextStyle(color: textGray, fontSize: 16),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 18),
+                        hintStyle: const TextStyle(
+                          color: textGray,
+                          fontSize: 16,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 18,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(color: borderColor),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFF8B0000), width: 2),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF8B0000),
+                            width: 2,
+                          ),
                         ),
                       ),
                     ),
@@ -136,7 +169,14 @@ class LoginView extends StatelessWidget {
                           elevation: 5,
                           shadowColor: const Color(0xFF8B0000).withOpacity(0.5),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MainView(),
+                            ),
+                          );
+                        },
                         child: const Text(
                           "MASUK",
                           style: TextStyle(

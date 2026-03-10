@@ -18,12 +18,14 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgGray,
-      
+
       // ==========================================
       // KONTEN UTAMA (BODY)
       // ==========================================
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 40), // Jarak agar tidak tertutup nav bar
+        padding: const EdgeInsets.only(
+          bottom: 40,
+        ), // Jarak agar tidak tertutup nav bar
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -54,7 +56,10 @@ class HomeView extends StatelessWidget {
                           children: [
                             Text(
                               "Selamat Pagi,",
-                              style: TextStyle(color: Colors.white70, fontSize: 14),
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
                             ),
                             Text(
                               "Budi Setiawan",
@@ -77,14 +82,17 @@ class HomeView extends StatelessWidget {
                       ],
                     ),
                   ),
-                  
+
                   // Card Status Identitas (Menimpa garis bawah merah)
                   Positioned(
                     bottom: 0,
                     left: 24,
                     right: 24,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -107,27 +115,52 @@ class HomeView extends StatelessWidget {
                                   color: goldColor.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Icon(Icons.fingerprint, color: goldColor, size: 20),
+                                child: const Icon(
+                                  Icons.fingerprint,
+                                  color: goldColor,
+                                  size: 20,
+                                ),
                               ),
                               const SizedBox(width: 12),
                               const Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("STATUS IDENTITAS", style: TextStyle(color: textGray, fontSize: 10, fontWeight: FontWeight.bold)),
-                                  Text("Terverifikasi (E-KTP)", style: TextStyle(color: textDark, fontSize: 14, fontWeight: FontWeight.bold)),
+                                  Text(
+                                    "STATUS IDENTITAS",
+                                    style: TextStyle(
+                                      color: textGray,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Terverifikasi (E-KTP)",
+                                    style: TextStyle(
+                                      color: textDark,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
                               color: primaryRed,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
                               "LIHAT QR",
-                              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -148,8 +181,22 @@ class HomeView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Layanan Digital", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textDark)),
-                      Text("Lihat Semua", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryRed.withOpacity(0.8))),
+                      const Text(
+                        "Layanan Digital",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: textDark,
+                        ),
+                      ),
+                      Text(
+                        "Lihat Semua",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: primaryRed.withOpacity(0.8),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -160,7 +207,7 @@ class HomeView extends StatelessWidget {
                       _buildMenuBtn(Icons.campaign, "Pengaduan"),
                       _buildMenuBtn(Icons.article, "Berita"),
                       // Tombol Darurat / Panic Button
-                      _buildMenuBtn(Icons.priority_high, "Darurat"), 
+                      _buildMenuBtn(Icons.priority_high, "Darurat"),
                     ],
                   ),
                 ],
@@ -177,8 +224,22 @@ class HomeView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Aktivitas Terakhir", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textDark)),
-                      Text("Riwayat", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryRed.withOpacity(0.8))),
+                      const Text(
+                        "Aktivitas Terakhir",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: textDark,
+                        ),
+                      ),
+                      Text(
+                        "Riwayat",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: primaryRed.withOpacity(0.8),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -188,17 +249,39 @@ class HomeView extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.02),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
                       ],
                     ),
                     child: Column(
                       children: [
-                        _buildActivityItem(Icons.check_circle, greenSuccess, bgSuccess, "Verifikasi E-KTP", "2 Jam yang lalu", "BERHASIL", greenSuccess, bgSuccess),
+                        _buildActivityItem(
+                          Icons.check_circle,
+                          greenSuccess,
+                          bgSuccess,
+                          "Verifikasi E-KTP",
+                          "2 Jam yang lalu",
+                          "BERHASIL",
+                          greenSuccess,
+                          bgSuccess,
+                        ),
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 12),
                           child: Divider(color: bgGray, thickness: 1.5),
                         ),
-                        _buildActivityItem(Icons.description, Colors.blue, Colors.blue.withOpacity(0.1), "Permohonan Surat", "Kemarin, 14:20", "PROSES", yellowProcess, bgProcess),
+                        _buildActivityItem(
+                          Icons.description,
+                          Colors.blue,
+                          Colors.blue.withOpacity(0.1),
+                          "Permohonan Surat",
+                          "Kemarin, 14:20",
+                          "PROSES",
+                          yellowProcess,
+                          bgProcess,
+                        ),
                       ],
                     ),
                   ),
@@ -225,55 +308,29 @@ class HomeView extends StatelessWidget {
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("INFORMASI PUBLIK", style: TextStyle(color: goldColor, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                    Text(
+                      "INFORMASI PUBLIK",
+                      style: TextStyle(
+                        color: goldColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
+                    ),
                     SizedBox(height: 8),
                     Text(
                       "Vaksinasi Massal\nKecamatan Merdeka",
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
           ],
-        ),
-      ),
-
-      // ==========================================
-      // TOMBOL KAMERA MELAYANG (FLOATING ACTION BUTTON)
-      // ==========================================
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Navigasi ke E-Report / Scan QR
-        },
-        backgroundColor: goldColor,
-        shape: CircleBorder(
-          side: const BorderSide(color: Colors.white, width: 4), // Border putih seperti Figma
-        ),
-        elevation: 6,
-        child: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-      // ==========================================
-      // BOTTOM NAVIGATION BAR
-      // ==========================================
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: SizedBox(
-          height: 65,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildBottomNavItem(Icons.home, "Home", true),
-              _buildBottomNavItem(Icons.mail, "Surat", false),
-              const SizedBox(width: 48), // Ruang kosong untuk tombol kamera di tengah
-              _buildBottomNavItem(Icons.history, "Aktivitas", false),
-              _buildBottomNavItem(Icons.person, "Profil", false),
-            ],
-          ),
         ),
       ),
     );
@@ -305,19 +362,39 @@ class HomeView extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: const Color(0xFFF3F4F6)),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 4, offset: const Offset(0, 2)),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
             ],
           ),
           child: Icon(icon, color: primaryRed, size: 24),
         ),
         const SizedBox(height: 8),
-        Text(label, style: const TextStyle(color: textGray, fontSize: 11, fontWeight: FontWeight.w600)),
+        Text(
+          label,
+          style: const TextStyle(
+            color: textGray,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
 
   // Item List Aktivitas
-  Widget _buildActivityItem(IconData icon, Color iconColor, Color iconBg, String title, String time, String status, Color statusColor, Color statusBg) {
+  Widget _buildActivityItem(
+    IconData icon,
+    Color iconColor,
+    Color iconBg,
+    String title,
+    String time,
+    String status,
+    Color statusColor,
+    Color statusBg,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -332,33 +409,36 @@ class HomeView extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: textDark, fontSize: 14, fontWeight: FontWeight.bold)),
-                Text(time, style: const TextStyle(color: textGray, fontSize: 10)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: textDark,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  time,
+                  style: const TextStyle(color: textGray, fontSize: 10),
+                ),
               ],
             ),
           ],
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(20)),
-          child: Text(status, style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold)),
-        ),
-      ],
-    );
-  }
-
-  // Item Bottom Navigation
-  Widget _buildBottomNavItem(IconData icon, String label, bool isActive) {
-    final color = isActive ? primaryRed : Colors.grey.shade400;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(color: color, fontSize: 10, fontWeight: isActive ? FontWeight.bold : FontWeight.normal),
+          decoration: BoxDecoration(
+            color: statusBg,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            status,
+            style: TextStyle(
+              color: statusColor,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ],
     );
