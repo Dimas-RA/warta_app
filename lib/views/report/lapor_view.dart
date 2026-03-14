@@ -35,7 +35,14 @@ class LaporView extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.fromLTRB(24, 50, 24, 0),
                     decoration: BoxDecoration(
-                      color: primaryRed,
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color.fromARGB(255, 83, 0, 0),
+                          Color(0xFF8B0000),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: const BorderRadius.vertical(
                         bottom: Radius.circular(40),
                       ),
@@ -51,13 +58,18 @@ class LaporView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Tombol Back
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            shape: BoxShape.circle,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
                           ),
-                          child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
                         ),
                         const SizedBox(height: 16),
                         // Teks Header
@@ -135,7 +147,7 @@ class LaporView extends StatelessWidget {
                 children: [
                   // Input: Judul Laporan
                   const Text("JUDUL LAPORAN", style: TextStyle(color: textDark, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   TextFormField(
                     style: const TextStyle(fontSize: 16),
                     decoration: InputDecoration(
@@ -159,7 +171,7 @@ class LaporView extends StatelessWidget {
 
                   // Input: Deskripsi Kejadian (Textarea)
                   const Text("DESKRIPSI KEJADIAN", style: TextStyle(color: textDark, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   TextFormField(
                     maxLines: 5, // Membuatnya jadi kotak besar (Textarea)
                     style: const TextStyle(fontSize: 16),
@@ -232,60 +244,6 @@ class LaporView extends StatelessWidget {
           ],
         ),
       ),
-
-      // ==========================================
-      // FLOATING ACTION BUTTON (KAMERA AKTIF)
-      // ==========================================
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: goldColor,
-        shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 4)),
-        elevation: 6,
-        child: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-      // ==========================================
-      // BOTTOM NAVIGATION BAR
-      // ==========================================
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: SizedBox(
-          height: 65,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildBottomNavItem(Icons.home, "Home", false),
-              _buildBottomNavItem(Icons.mail, "Surat", false),
-              const SizedBox(width: 48), // Ruang Kamera
-              _buildBottomNavItem(Icons.history, "Aktivitas", false), // Belum ada menu aktif di nav bawah ini, sesuaikan nanti
-              _buildBottomNavItem(Icons.person, "Profil", false),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Helper Item Bottom Navigation
-  Widget _buildBottomNavItem(IconData icon, String label, bool isActive) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: isActive ? primaryRed : const Color(0xFF9CA3AF), size: 20),
-        const SizedBox(height: 4),
-        Text(
-          label, 
-          style: TextStyle(
-            color: isActive ? primaryRed : const Color(0xFF9CA3AF), 
-            fontSize: 10, 
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w500
-          )
-        ),
-      ],
     );
   }
 }

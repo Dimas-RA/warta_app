@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'aktivitas_detail_view.dart';
 
-class AktivitasView extends StatelessWidget {
+class AktivitasView extends StatefulWidget {
   const AktivitasView({super.key});
+
+  @override
+  State<AktivitasView> createState() => _AktivitasViewState();
+}
+
+class _AktivitasViewState extends State<AktivitasView> {
+  int _activeTabIndex = 0; // 0: Semua, 1: Menunggu, 2: Selesai
 
   // Warna Konsisten WARTA
   static const Color primaryRed = Color(0xFF8B0000);
-  static const Color primaryRedDark = Color(
-    0xFFB10000,
-  ); // Merah untuk tombol aktif
   static const Color bgApp = Color(0xFFF8FAFC);
   static const Color textDark = Color(0xFF0F172A);
   static const Color textGray = Color(0xFF64748B);
@@ -136,9 +141,9 @@ class AktivitasView extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildTabButton("Semua", isActive: true),
-                        _buildTabButton("Menunggu", isActive: false),
-                        _buildTabButton("Selesai", isActive: false),
+                        _buildTabButton("Semua", 0),
+                        _buildTabButton("Menunggu", 1),
+                        _buildTabButton("Selesai", 2),
                       ],
                     ),
                   ),
@@ -150,109 +155,125 @@ class AktivitasView extends StatelessWidget {
             // ==========================================
             // 2. KELOMPOK: HARI INI
             // ==========================================
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "HARI INI",
-                    style: TextStyle(
-                      color: textLightGray,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+            if (_activeTabIndex == 0 ||
+                _activeTabIndex == 1 ||
+                _activeTabIndex == 2)
+              if (_activeTabIndex != 2 ||
+                  true) // Memastikan header selalu menyesuaikan isi, tapi kalau 2 masih ada item HARI INI (Verifikasi)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_activeTabIndex == 0 ||
+                          _activeTabIndex == 1 ||
+                          _activeTabIndex == 2)
+                        const Text(
+                          "HARI INI",
+                          style: TextStyle(
+                            color: textLightGray,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                      const SizedBox(height: 16),
 
-                  // Item 1: Verifikasi E-KTP (Berhasil)
-                  _buildActivityCard(
-                    icon: Icons.check_circle,
-                    iconColor: colorSuccess,
-                    iconBg: bgSuccess,
-                    title: "Verifikasi E-KTP",
-                    subtitle: "Identitas Kependudukan Digital",
-                    status: "BERHASIL",
-                    statusColor: colorSuccess,
-                    statusBg: bgSuccess,
-                    time: "14:30 WIB",
-                    actionText: "LIHAT DETAIL",
-                  ),
-                  const SizedBox(height: 16),
+                      // Item 1: Verifikasi E-KTP (Berhasil)
+                      if (_activeTabIndex == 0 || _activeTabIndex == 2)
+                        _buildActivityCard(
+                          icon: Icons.check_circle,
+                          iconColor: colorSuccess,
+                          iconBg: bgSuccess,
+                          title: "Verifikasi E-KTP",
+                          subtitle: "Identitas Kependudukan Digital",
+                          status: "BERHASIL",
+                          statusColor: colorSuccess,
+                          statusBg: bgSuccess,
+                          time: "14:30 WIB",
+                          actionText: "LIHAT DETAIL",
+                          onTap: () => _showDetailDialog(context, "Verifikasi E-KTP", "Identitas Kependudukan Digital", "BERHASIL", "14:30 WIB"),
+                        ),
+                      if ((_activeTabIndex == 0 || _activeTabIndex == 2) &&
+                          (_activeTabIndex == 0 || _activeTabIndex == 1))
+                        const SizedBox(height: 16),
 
-                  // Item 2: Permohonan SKCK (Proses) dengan indikator tahapan
-                  _buildActivityCard(
-                    icon: Icons.description,
-                    iconColor: colorProcess,
-                    iconBg: bgProcess,
-                    title: "Permohonan SKCK",
-                    subtitle: "Layanan Kepolisian",
-                    status: "PROSES",
-                    statusColor: colorProcess,
-                    statusBg: bgProcess,
-                    time: "09:15 WIB",
-                    actionText: "LIHAT DETAIL",
-                    customContent: _buildProgressIndicator(), // Indikator 1-2-3
+                      // Item 2: Permohonan SKCK (Proses) dengan indikator tahapan
+                      if (_activeTabIndex == 0 || _activeTabIndex == 1)
+                        _buildActivityCard(
+                          icon: Icons.description,
+                          iconColor: colorProcess,
+                          iconBg: bgProcess,
+                          title: "Permohonan SKCK",
+                          subtitle: "Layanan Kepolisian",
+                          status: "PROSES",
+                          statusColor: colorProcess,
+                          statusBg: bgProcess,
+                          time: "09:15 WIB",
+                          actionText: "LIHAT DETAIL",
+                          customContent:
+                              _buildProgressIndicator(), // Indikator 1-2-3
+                          onTap: () => _showDetailDialog(context, "Permohonan SKCK", "Layanan Kepolisian", "PROSES", "09:15 WIB"),
+                        ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
 
             const SizedBox(height: 32),
 
             // ==========================================
             // 3. KELOMPOK: KEMARIN
             // ==========================================
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "KEMARIN",
-                    style: TextStyle(
-                      color: textLightGray,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.1,
+            if (_activeTabIndex == 0 || _activeTabIndex == 2)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "KEMARIN",
+                      style: TextStyle(
+                        color: textLightGray,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.1,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Item 3: Pengajuan KK Baru (Ditolak)
-                  _buildActivityCard(
-                    icon: Icons.cancel,
-                    iconColor: colorReject,
-                    iconBg: bgReject,
-                    title: "Pengajuan KK Baru",
-                    subtitle: "Dokumen Tidak Lengkap",
-                    status: "DITOLAK",
-                    statusColor: colorReject,
-                    statusBg: bgReject,
-                    time: "16:45 WIB",
-                    actionText: "AJUKAN ULANG",
-                    actionColor: goldColor,
-                  ),
-                  const SizedBox(height: 16),
+                    // Item 3: Pengajuan KK Baru (Ditolak)
+                    _buildActivityCard(
+                      icon: Icons.cancel,
+                      iconColor: colorReject,
+                      iconBg: bgReject,
+                      title: "Pengajuan KK Baru",
+                      subtitle: "Dokumen Tidak Lengkap",
+                      status: "DITOLAK",
+                      statusColor: colorReject,
+                      statusBg: bgReject,
+                      time: "16:45 WIB",
+                      actionText: "AJUKAN ULANG",
+                      actionColor: goldColor,
+                      onTap: () => _showDetailDialog(context, "Pengajuan KK Baru", "Dokumen Tidak Lengkap", "DITOLAK", "16:45 WIB"),
+                    ),
+                    const SizedBox(height: 16),
 
-                  // Item 4: Laporan Jalan Rusak (Selesai/Berhasil)
-                  _buildActivityCard(
-                    icon: Icons
-                        .campaign, // Menggunakan ikon pengeras suara seperti di desain
-                    iconColor: const Color(0xFFF97316), // Oranye
-                    iconBg: const Color(0xFFFFF7ED),
-                    title: "Laporan Jalan Rusak",
-                    subtitle: "Pengaduan Masyarakat",
-                    status: "SELESAI",
-                    statusColor: colorSuccess,
-                    statusBg: bgSuccess,
-                    time: "10:20 WIB",
-                    actionText: "LIHAT TANGGAPAN",
-                  ),
-                ],
+                    // Item 4: Laporan Jalan Rusak (Selesai/Berhasil)
+                    _buildActivityCard(
+                      icon: Icons.campaign,
+                      iconColor: const Color(0xFFF97316),
+                      iconBg: const Color(0xFFFFF7ED),
+                      title: "Laporan Jalan Rusak",
+                      subtitle: "Pengaduan Masyarakat",
+                      status: "SELESAI",
+                      statusColor: colorSuccess,
+                      statusBg: bgSuccess,
+                      time: "10:20 WIB",
+                      actionText: "LIHAT TANGGAPAN",
+                    ),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -262,34 +283,44 @@ class AktivitasView extends StatelessWidget {
   // --- WIDGET HELPER ---
 
   // Tombol Filter Tab di Header
-  Widget _buildTabButton(String label, {required bool isActive}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-      decoration: BoxDecoration(
-        // Jika aktif, gunakan gradasi yang sama dengan header
-        gradient: isActive
-            ? const LinearGradient(
-                colors: [Color(0xFF8B0000), Color.fromARGB(255, 83, 0, 0)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null, // Jika tidak aktif, tidak pakai gradasi
-        color: isActive ? null : Colors.white, // Jika tidak aktif, pakai putih
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+  Widget _buildTabButton(String label, int index) {
+    bool isActive = _activeTabIndex == index;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _activeTabIndex = index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+        decoration: BoxDecoration(
+          // Jika aktif, gunakan gradasi yang sama dengan header
+          gradient: isActive
+              ? const LinearGradient(
+                  colors: [Color(0xFF8B0000), Color.fromARGB(255, 83, 0, 0)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null, // Jika tidak aktif, tidak pakai gradasi
+          color: isActive
+              ? null
+              : Colors.white, // Jika tidak aktif, pakai putih
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isActive ? Colors.white : Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
           ),
-        ],
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isActive ? Colors.white : Colors.black87,
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
         ),
       ),
     );
@@ -309,8 +340,12 @@ class AktivitasView extends StatelessWidget {
     required String actionText,
     Color? actionColor, // Opsional, default merah marun
     Widget? customContent, // Untuk indikator 1-2-3 pada proses SKCK
+    VoidCallback? onTap,
   }) {
-    return Container(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -412,6 +447,7 @@ class AktivitasView extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -465,6 +501,20 @@ class AktivitasView extends StatelessWidget {
           color: textColor,
           fontSize: 10,
           fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  void _showDetailDialog(BuildContext context, String title, String subtitle, String status, String time) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AktivitasDetailView(
+          title: title,
+          subtitle: subtitle,
+          status: status,
+          time: time,
         ),
       ),
     );

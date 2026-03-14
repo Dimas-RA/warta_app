@@ -18,13 +18,19 @@ class _MainViewState extends State<MainView> {
   final MainViewModel _viewModel = MainViewModel();
 
   // Daftar halaman yang akan ditampilkan sesuai urutan tab
-  final List<Widget> _pages = [
-    const HomeView(), // Index 0
-    const SuratView(), // Index 1
-    const SizedBox(), // Index 2 (Dikosongkan karena ini area tombol Kamera)
-    const AktivitasView(), // Index 3
-    const ProfilView(), // Index 4
-  ];
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      HomeView(onNavigate: _viewModel.setIndex), // Index 0
+      SuratView(onNavigate: _viewModel.setIndex), // Index 1
+      const SizedBox(), // Index 2 (Dikosongkan karena ini area tombol Kamera)
+      const AktivitasView(), // Index 3
+      const ProfilView(), // Index 4
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {

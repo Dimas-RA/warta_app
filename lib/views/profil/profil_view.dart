@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import '../auth/login_view.dart';
+import 'profil_detail_view.dart';
 
-class ProfilView extends StatelessWidget {
-  const ProfilView({super.key});
+const Color primaryRed = Color(0xFF8B0000);
+const Color bgApp = Color(0xFFF8F9FA);
+const Color textDark = Color(0xFF0F172A);
+const Color textGray = Color(0xFF94A3B8);
+const Color goldColor = Color(0xFFD4AF37);
+const Color borderColor = Color(0xFFF1F5F9);
 
-  // Warna Konsisten WARTA
-  static const Color primaryRed = Color(0xFF8B0000);
-  static const Color bgApp = Color(0xFFF8F9FA);
-  static const Color textDark = Color(0xFF0F172A);
-  static const Color textGray = Color(0xFF94A3B8);
-  static const Color goldColor = Color(0xFFD4AF37);
-  static const Color borderColor = Color(0xFFF1F5F9);
+class ProfilView extends StatefulWidget {
+  final Function(int)? onNavigate;
+  const ProfilView({super.key, this.onNavigate});
+
+  @override
+  State<ProfilView> createState() => _ProfilViewState();
+}
+
+class _ProfilViewState extends State<ProfilView> {
+  bool _useBiometric = true;
 
   @override
   Widget build(BuildContext context) {
@@ -94,16 +103,24 @@ class ProfilView extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.settings,
-                          color: Colors.white,
-                          size: 20,
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Pengaturan Akun")),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.settings,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
                       ),
                     ],
@@ -387,29 +404,58 @@ class ProfilView extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildQuickAction(
-                        Icons.account_balance_wallet,
-                        const Color(0xFF8B0000),
-                        const Color(0xFFFEF2F2),
-                        "Dompet",
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Dompet Digital")),
+                          );
+                        },
+                        child: _buildQuickAction(
+                          Icons.account_balance_wallet,
+                          const Color(0xFF8B0000),
+                          const Color(0xFFFEF2F2),
+                          "Dompet",
+                        ),
                       ),
-                      _buildQuickAction(
-                        Icons.receipt_long,
-                        const Color(0xFF3B82F6),
-                        const Color(0xFFEFF6FF),
-                        "Riwayat",
+                      InkWell(
+                        onTap: () {
+                          if (widget.onNavigate != null) widget.onNavigate!(3);
+                        },
+                        child: _buildQuickAction(
+                          Icons.receipt_long,
+                          const Color(0xFF3B82F6),
+                          const Color(0xFFEFF6FF),
+                          "Riwayat",
+                        ),
                       ),
-                      _buildQuickAction(
-                        Icons.star,
-                        const Color(0xFFD97706),
-                        const Color(0xFFFEF3C7),
-                        "Poin",
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Poin WARTA")),
+                          );
+                        },
+                        child: _buildQuickAction(
+                          Icons.star,
+                          const Color(0xFFD97706),
+                          const Color(0xFFFEF3C7),
+                          "Poin",
+                        ),
                       ),
-                      _buildQuickAction(
-                        Icons.help_outline,
-                        const Color(0xFF16A34A),
-                        const Color(0xFFDCFCE7),
-                        "Bantuan",
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Pusat Bantuan")),
+                          );
+                        },
+                        child: _buildQuickAction(
+                          Icons.help_outline,
+                          const Color(0xFF16A34A),
+                          const Color(0xFFDCFCE7),
+                          "Bantuan",
+                        ),
                       ),
                     ],
                   ),
@@ -444,11 +490,23 @@ class ProfilView extends StatelessWidget {
                             _buildMenuItem(
                               Icons.person_outline,
                               "Informasi Pribadi",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Informasi Pribadi")),
+                                );
+                              },
                             ),
                             const Divider(height: 1, color: borderColor),
                             _buildMenuItem(
                               Icons.lock_outline,
                               "Ubah PIN Keamanan",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Ubah PIN Keamanan")),
+                                );
+                              },
                             ),
                             const Divider(height: 1, color: borderColor),
                             _buildMenuItem(
@@ -456,6 +514,12 @@ class ProfilView extends StatelessWidget {
                               "Biometrik Login",
                               subtitle: "Gunakan Face ID atau Sidik Jari",
                               isSwitch: true,
+                              switchValue: _useBiometric,
+                              onSwitchChanged: (val) {
+                                setState(() {
+                                  _useBiometric = val;
+                                });
+                              },
                             ),
                           ],
                         ),
@@ -493,12 +557,39 @@ class ProfilView extends StatelessWidget {
                             _buildMenuItem(
                               Icons.description_outlined,
                               "Syarat & Ketentuan",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Syarat & Ketentuan")),
+                                );
+                              },
                             ),
                             const Divider(height: 1, color: borderColor),
                             _buildMenuItem(
                               Icons.logout,
                               "Keluar dari Aplikasi",
                               isLogout: true,
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text("Konfirmasi Logout"),
+                                    content: const Text("Apakah Anda yakin ingin keluar?"),
+                                    actions: [
+                                      TextButton(onPressed: () => Navigator.pop(context), child: const Text("BATAL")),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(builder: (_) => const LoginView()),
+                                          );
+                                        },
+                                        child: const Text("KELUAR", style: TextStyle(color: primaryRed, fontWeight: FontWeight.bold)),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -512,7 +603,7 @@ class ProfilView extends StatelessWidget {
                 // --- VERSI APLIKASI ---
                 const Center(
                   child: Text(
-                    "WARTA APP v2.4.0",
+                    "WARTA APP v1.0.0",
                     style: TextStyle(
                       color: textGray,
                       fontSize: 10,
@@ -568,59 +659,65 @@ class ProfilView extends StatelessWidget {
     String title, {
     String? subtitle,
     bool isSwitch = false,
+    bool switchValue = false,
+    Function(bool)? onSwitchChanged,
     bool isLogout = false,
+    VoidCallback? onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isLogout
-                  ? primaryRed.withOpacity(0.1)
-                  : const Color(0xFFFEF2F2),
-              borderRadius: BorderRadius.circular(8),
+    return InkWell(
+      onTap: isSwitch ? null : onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isLogout
+                    ? primaryRed.withOpacity(0.1)
+                    : const Color(0xFFFEF2F2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: isLogout ? primaryRed : primaryRed,
+                size: 18,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: isLogout ? primaryRed : primaryRed,
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: isLogout ? primaryRed : textDark,
-                    fontSize: 14,
-                    fontWeight: isLogout ? FontWeight.bold : FontWeight.w600,
-                  ),
-                ),
-                if (subtitle != null) ...[
-                  const SizedBox(height: 2),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    subtitle,
-                    style: const TextStyle(color: textGray, fontSize: 10),
+                    title,
+                    style: TextStyle(
+                      color: isLogout ? primaryRed : textDark,
+                      fontSize: 14,
+                      fontWeight: isLogout ? FontWeight.bold : FontWeight.w600,
+                    ),
                   ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(color: textGray, fontSize: 10),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-          if (isSwitch)
-            Switch(
-              value: true,
-              onChanged: (val) {},
-              activeColor: Colors.white,
-              activeTrackColor: primaryRed,
-            )
-          else if (!isLogout)
-            const Icon(Icons.chevron_right, color: textGray, size: 20),
-        ],
+            if (isSwitch)
+              Switch(
+                value: switchValue,
+                onChanged: onSwitchChanged,
+                activeColor: Colors.white,
+                activeTrackColor: primaryRed,
+              )
+            else if (!isLogout)
+              const Icon(Icons.chevron_right, color: textGray, size: 20),
+          ],
+        ),
       ),
     );
   }

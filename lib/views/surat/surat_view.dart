@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../utils/top_notification.dart';
+import 'surat_detail_view.dart';
 
 class SuratView extends StatelessWidget {
-  const SuratView({super.key});
+  final Function(int) onNavigate;
+
+  const SuratView({super.key, required this.onNavigate});
 
   // Warna sesuai CSS Figma
   static const Color primaryRed = Color(0xFF8B0000);
@@ -93,8 +97,14 @@ class SuratView extends StatelessWidget {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    _buildTopIcon(Icons.arrow_back),
-                                    _buildTopIcon(Icons.history),
+                                    InkWell(
+                                      onTap: () => onNavigate(0), // Home
+                                      child: _buildTopIcon(Icons.arrow_back),
+                                    ),
+                                    InkWell(
+                                      onTap: () => onNavigate(3), // Aktivitas
+                                      child: _buildTopIcon(Icons.history),
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 16),
@@ -150,44 +160,57 @@ class SuratView extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            child: const Row(
-                              children: [
-                                Icon(
+                            child: TextField(
+                              onSubmitted: (value) {
+                                TopNotification.show(context: context, message: "Mencari surat: $value");
+                              },
+                              decoration: const InputDecoration(
+                                hintText: "Cari jenis surat...",
+                                hintStyle: TextStyle(
+                                  color: Color(0xFF9CA3AF),
+                                  fontSize: 14,
+                                ),
+                                prefixIcon: Icon(
                                   Icons.search,
                                   color: Color(0xFF9CA3AF),
                                   size: 20,
                                 ),
-                                SizedBox(width: 12),
-                                Text(
-                                  "Cari jenis surat...",
-                                  style: TextStyle(
-                                    color: Color(0xFF9CA3AF),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(vertical: 14),
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
                         // Tombol Filter Merah
-                        Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 117, 0, 0),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 6,
-                                offset: const Offset(0, 4),
+                        InkWell(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) => Container(
+                                padding: const EdgeInsets.all(24),
+                                child: const Text("Fitur Filter Surat"),
                               ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.filter_list,
-                            color: Colors.white,
+                            );
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 117, 0, 0),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.filter_list,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ],
@@ -221,22 +244,28 @@ class SuratView extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildCategoryCard(
-                          Icons.description,
-                          const Color(0xFF2563EB),
-                          const Color(0xFFEFF6FF),
-                          "Administrasi",
-                          "KK, KTP, Akta",
+                        child: InkWell(
+                          onTap: () => _showDialogFilter(context, "Administrasi"),
+                          child: _buildCategoryCard(
+                            Icons.description,
+                            const Color(0xFF2563EB),
+                            const Color(0xFFEFF6FF),
+                            "Administrasi",
+                            "KK, KTP, Akta",
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: _buildCategoryCard(
-                          Icons.domain,
-                          const Color(0xFFEA580C),
-                          const Color(0xFFFFF7ED),
-                          "Perizinan",
-                          "Usaha, Bangunan",
+                        child: InkWell(
+                          onTap: () => _showDialogFilter(context, "Perizinan"),
+                          child: _buildCategoryCard(
+                            Icons.domain,
+                            const Color(0xFFEA580C),
+                            const Color(0xFFFFF7ED),
+                            "Perizinan",
+                            "Usaha, Bangunan",
+                          ),
                         ),
                       ),
                     ],
@@ -247,22 +276,28 @@ class SuratView extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildCategoryCard(
-                          Icons.volunteer_activism,
-                          const Color(0xFF9333EA),
-                          const Color(0xFFFAF5FF),
-                          "Keterangan",
-                          "Tidak Mampu, Domisili",
+                        child: InkWell(
+                          onTap: () => _showDialogFilter(context, "Keterangan"),
+                          child: _buildCategoryCard(
+                            Icons.volunteer_activism,
+                            const Color(0xFF9333EA),
+                            const Color(0xFFFAF5FF),
+                            "Keterangan",
+                            "Tidak Mampu, Domisili",
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: _buildCategoryCard(
-                          Icons.gavel,
-                          const Color(0xFF16A34A),
-                          const Color(0xFFF0FDF4),
-                          "Hukum",
-                          "Ahli Waris, Tanah",
+                        child: InkWell(
+                          onTap: () => _showDialogFilter(context, "Hukum"),
+                          child: _buildCategoryCard(
+                            Icons.gavel,
+                            const Color(0xFF16A34A),
+                            const Color(0xFFF0FDF4),
+                            "Hukum",
+                            "Ahli Waris, Tanah",
+                          ),
                         ),
                       ),
                     ],
@@ -290,22 +325,31 @@ class SuratView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildPopularItem(
-                    Icons.home,
-                    "Surat Keterangan Domisili",
-                    "Administrasi Kependudukan",
+                  InkWell(
+                    onTap: () => _showSuratDialog(context, "Surat Keterangan Domisili"),
+                    child: _buildPopularItem(
+                      Icons.home,
+                      "Surat Keterangan Domisili",
+                      "Administrasi Kependudukan",
+                    ),
                   ),
                   const SizedBox(height: 12),
-                  _buildPopularItem(
-                    Icons.storefront,
-                    "Surat Izin Usaha Mikro",
-                    "Perizinan Usaha",
+                  InkWell(
+                    onTap: () => _showSuratDialog(context, "Surat Izin Usaha Mikro"),
+                    child: _buildPopularItem(
+                      Icons.storefront,
+                      "Surat Izin Usaha Mikro",
+                      "Perizinan Usaha",
+                    ),
                   ),
                   const SizedBox(height: 12),
-                  _buildPopularItem(
-                    Icons.family_restroom,
-                    "Surat Keterangan Kelahiran",
-                    "Pencatatan Sipil",
+                  InkWell(
+                    onTap: () => _showSuratDialog(context, "Surat Keterangan Kelahiran"),
+                    child: _buildPopularItem(
+                      Icons.family_restroom,
+                      "Surat Keterangan Kelahiran",
+                      "Pencatatan Sipil",
+                    ),
                   ),
                 ],
               ),
@@ -317,6 +361,29 @@ class SuratView extends StatelessWidget {
   }
 
   // --- WIDGET HELPER ---
+
+  void _showDialogFilter(BuildContext context, String kategori) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Kategori: $kategori"),
+        content: Text("Menampilkan daftar jenis surat untuk kategori $kategori."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("TUTUP"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSuratDialog(BuildContext context, String judul) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => SuratDetailView(title: judul)),
+    );
+  }
 
   // Ikon Bulat Transparan di Header (Back & History)
   Widget _buildTopIcon(IconData icon) {

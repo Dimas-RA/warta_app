@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
+import '../report/lapor_view.dart';
+import '../darurat/darurat_view.dart';
+import '../berita/berita_view.dart';
+import '../../utils/top_notification.dart';
 
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+class HomeView extends StatefulWidget {
+  final Function(int) onNavigate;
+  const HomeView({super.key, required this.onNavigate});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  bool _hasNotification = false;
 
   // Warna sesuai CSS Figma
   static const Color primaryRed = Color(0xFF8B0000);
@@ -103,9 +115,23 @@ class HomeView extends StatelessWidget {
                               ),
                               Row(
                                 children: [
-                                  _buildTopIcon(Icons.notifications_none),
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _hasNotification = !_hasNotification;
+                                      });
+                                    },
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: _buildTopIcon(_hasNotification ? Icons.notifications_active : Icons.notifications_none),
+                                  ),
                                   const SizedBox(width: 8),
-                                  _buildTopIcon(Icons.search),
+                                  InkWell(
+                                    onTap: () {
+                                      _showSearchBottomSheet(context);
+                                    },
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: _buildTopIcon(Icons.search),
+                                  ),
                                 ],
                               ),
                             ],
@@ -173,23 +199,28 @@ class HomeView extends StatelessWidget {
                                   ),
                                 ),
                                 // Tombol Lihat QR
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF8B0000),
-                                    borderRadius: BorderRadius.circular(
-                                      12,
-                                    ), // Radius disesuaikan
-                                  ),
-                                  child: const Text(
-                                    "LIHAT QR",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
+                                GestureDetector(
+                                  onTap: () {
+                                    _showQrDialog(context);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF8B0000),
+                                      borderRadius: BorderRadius.circular(
+                                        12,
+                                      ), // Radius disesuaikan
+                                    ),
+                                    child: const Text(
+                                      "LIHAT QR",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -222,26 +253,65 @@ class HomeView extends StatelessWidget {
                           color: textDark,
                         ),
                       ),
-                      Text(
-                        "Lihat Semua",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: primaryRed.withOpacity(0.8),
+                      InkWell(
+                        onTap: () {
+                          TopNotification.show(
+                            context: context,
+                            message: "Menampilkan semua layanan...",
+                          );
+                        },
+                        child: Text(
+                          "Lihat Semua",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: primaryRed.withOpacity(0.8),
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildMenuBtn(Icons.badge, "Digital ID"),
-                      _buildMenuBtn(Icons.campaign, "Pengaduan"),
-                      _buildMenuBtn(Icons.article, "Berita"),
-                      _buildMenuBtn(Icons.priority_high, "Darurat"),
-                    ],
-                  ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () => widget.onNavigate(4), // Profil
+                          borderRadius: BorderRadius.circular(16),
+                          child: _buildMenuBtn(Icons.badge, "Digital ID"),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const LaporView()),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: _buildMenuBtn(Icons.campaign, "Pengaduan"),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const BeritaView()),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: _buildMenuBtn(Icons.article, "Berita"),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const DaruratView()),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: _buildMenuBtn(Icons.warning_amber_rounded, "Darurat"),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -264,12 +334,15 @@ class HomeView extends StatelessWidget {
                           color: textDark,
                         ),
                       ),
-                      Text(
-                        "Riwayat",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: primaryRed.withOpacity(0.8),
+                      InkWell(
+                        onTap: () => widget.onNavigate(3), // Aktivitas
+                        child: Text(
+                          "Riwayat",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: primaryRed.withOpacity(0.8),
+                          ),
                         ),
                       ),
                     ],
@@ -291,6 +364,7 @@ class HomeView extends StatelessWidget {
                     child: Column(
                       children: [
                         _buildActivityItem(
+                          context, // Pass context here
                           Icons.check_circle,
                           greenSuccess,
                           bgSuccess,
@@ -305,6 +379,7 @@ class HomeView extends StatelessWidget {
                           child: Divider(color: bgGray, thickness: 1.5),
                         ),
                         _buildActivityItem(
+                          context, // Pass context here
                           Icons.description,
                           Colors.blue,
                           Colors.blue.withOpacity(0.1),
@@ -326,44 +401,53 @@ class HomeView extends StatelessWidget {
             // 4. BANNER INFORMASI PUBLIK
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: primaryRed, // Warna dasar merah
-                  borderRadius: BorderRadius.circular(16),
-                  // PERUBAHAN: Background efek kota transparan
-                  image: DecorationImage(
-                    image: const AssetImage('assets/images/city_bg.webp'),
-                    fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
-                      primaryRed.withOpacity(0.3),
-                      BlendMode.dstATop,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const BeritaView()),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: primaryRed, // Warna dasar merah
+                    borderRadius: BorderRadius.circular(16),
+                    // PERUBAHAN: Background efek kota transparan
+                    image: DecorationImage(
+                      image: const AssetImage('assets/images/city_bg.webp'),
+                      fit: BoxFit.cover,
+                      colorFilter: ColorFilter.mode(
+                        primaryRed.withOpacity(0.3),
+                        BlendMode.dstATop,
+                      ),
                     ),
                   ),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "INFORMASI PUBLIK",
-                      style: TextStyle(
-                        color: goldColor,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "INFORMASI PUBLIK",
+                        style: TextStyle(
+                          color: goldColor,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      "Vaksinasi Massal\nKecamatan Merdeka",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      SizedBox(height: 8),
+                      Text(
+                        "Vaksinasi Massal\nKecamatan Merdeka",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -427,6 +511,7 @@ class HomeView extends StatelessWidget {
 
   // Item List Aktivitas
   Widget _buildActivityItem(
+    BuildContext context,
     IconData icon,
     Color iconColor,
     Color iconBg,
@@ -436,9 +521,25 @@ class HomeView extends StatelessWidget {
     Color statusColor,
     Color statusBg,
   ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
+    return InkWell(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Detail $title"),
+            content: Text("Aktivitas ini diubah terakhir pada:\n$time\nStatus saat ini: $status"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("TUTUP", style: TextStyle(color: Color(0xFF8B0000))),
+              ),
+            ],
+          ),
+        );
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
         Row(
           children: [
             Container(
@@ -482,6 +583,123 @@ class HomeView extends StatelessWidget {
           ),
         ),
       ],
+    ),
+    );
+  }
+
+  void _showSearchBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 24,
+            right: 24,
+            top: 24,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Pencarian",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                onSubmitted: (value) {
+                  Navigator.pop(context); // close bottom sheet
+                  TopNotification.show(
+                    context: context,
+                    message: "Mendaftar pencarian: $value",
+                    isSuccess: true,
+                  );
+                },
+                decoration: InputDecoration(
+                  hintText: "Cari layanan, berita, dll...",
+                  prefixIcon: const Icon(Icons.search, color: Color(0xFF8B0000)),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showQrDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Digital ID QR",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Icon(
+                Icons.qr_code_2,
+                size: 150,
+                color: Colors.black87,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF8B0000),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Tutup",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

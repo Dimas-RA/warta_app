@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import '../main/main_view.dart';
 import '../auth/register_view.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
   const LoginView({super.key});
+
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -130,15 +137,22 @@ class LoginView extends StatelessWidget {
 
                     // Input Password
                     TextField(
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(
                           Icons.lock,
                           color: Color(0xFF8B0000),
                         ),
-                        suffixIcon: const Icon(
-                          Icons.visibility,
-                          color: textGray,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            color: textGray,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
                         ),
                         hintText: "Password",
                         hintStyle: const TextStyle(
@@ -179,9 +193,7 @@ class LoginView extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => const MainView(),
-                            ),
+                            MaterialPageRoute(builder: (_) => const MainView()),
                           );
                         },
                         child: const Text(
@@ -218,9 +230,7 @@ class LoginView extends StatelessWidget {
                           // Pindah ke halaman utama (ganti MainNavigationPage dengan nama class Navbar kamu)
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => const RegisterView(),
-                            ),
+                            MaterialPageRoute(builder: (_) => const RegisterView()),
                           );
                         },
                         child: const Text(
