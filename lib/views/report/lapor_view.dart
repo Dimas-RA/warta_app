@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/top_notification.dart';
 
 class LaporView extends StatelessWidget {
   const LaporView({super.key});
@@ -57,30 +58,42 @@ class LaporView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Tombol Back
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              shape: BoxShape.circle,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Tombol Back
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+                              ),
                             ),
-                            child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // Teks Header
-                        const Text(
-                          "Lapor Kejadian",
-                          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Lapor Kejadian tidak sesuai di lingkungan anda",
-                          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.w500),
+                            const SizedBox(width: 16),
+                            // Teks Header & Sub
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Lapor Kejadian",
+                                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "Lapor Kejadian tidak sesuai di lingkungan anda",
+                                    style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -226,7 +239,16 @@ class LaporView extends StatelessWidget {
                         shadowColor: primaryRedDark.withOpacity(0.4),
                       ),
                       onPressed: () {
-                        // TODO: Logika Submit Laporan (FR-25)
+                        TopNotification.show(
+                          context: context,
+                          message: "Laporan kejadian berhasil dikirim!",
+                          isSuccess: true,
+                        );
+                        Future.delayed(const Duration(seconds: 1), () {
+                          if (context.mounted) {
+                            Navigator.popUntil(context, (route) => route.isFirst);
+                          }
+                        });
                       },
                       child: const Text(
                         "Kirim Laporan",

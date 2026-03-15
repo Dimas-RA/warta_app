@@ -1,7 +1,10 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../auth/login_view.dart';
 import 'profil_detail_view.dart';
+import 'iuran_view.dart';
+import 'jadwal_ronda_view.dart';
+import 'bantuan_view.dart';
+import 'dart:ui';
 
 const Color primaryRed = Color(0xFF8B0000);
 const Color bgApp = Color(0xFFF8F9FA);
@@ -20,6 +23,92 @@ class ProfilView extends StatefulWidget {
 
 class _ProfilViewState extends State<ProfilView> {
   bool _useBiometric = true;
+
+  void _showQRCodeBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+          ),
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 32),
+              const Text(
+                "QR Code ID Digital",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: textDark,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Tunjukkan kode ini untuk keperluan verifikasi",
+                style: TextStyle(color: textGray, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.qr_code_2,
+                  size: 200,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryRed,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    "Tutup",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +129,7 @@ class _ProfilViewState extends State<ProfilView> {
                 // Menerapkan Gradasi yang lebih terang dari kartu E-KTP
                 gradient: LinearGradient(
                   colors: [
-                    Color.fromARGB(255, 83, 0, 0), 
+                    Color.fromARGB(255, 83, 0, 0),
                     Color(0xFF8B0000), // Merah gelap (sama seperti primaryRed)
                   ],
                   begin: Alignment.topLeft,
@@ -108,7 +197,11 @@ class _ProfilViewState extends State<ProfilView> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Pengaturan Akun")),
+                            MaterialPageRoute(
+                              builder: (_) => const ProfilDetailView(
+                                menuName: "Pengaturan Akun",
+                              ),
+                            ),
                           );
                         },
                         child: Container(
@@ -261,11 +354,38 @@ class _ProfilViewState extends State<ProfilView> {
                           children: [
                             Row(
                               children: [
-                                const Icon(
-                                  Icons.shield,
-                                  color: goldColor,
-                                  size: 30,
-                                ), // Placeholder Garuda
+                                Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(30),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.vertical(
+                                              bottom: Radius.circular(30),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                                 const SizedBox(width: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,18 +495,21 @@ class _ProfilViewState extends State<ProfilView> {
                               ],
                             ),
                             // Kotak QR Code
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.qr_code_2,
-                                  color: Colors.black,
-                                  size: 40,
+                            InkWell(
+                              onTap: () => _showQRCodeBottomSheet(context),
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.qr_code_2,
+                                    color: Colors.black,
+                                    size: 40,
+                                  ),
                                 ),
                               ),
                             ),
@@ -399,63 +522,70 @@ class _ProfilViewState extends State<ProfilView> {
 
                 const SizedBox(height: 32),
 
-                // --- QUICK ACTIONS (Dompet, Riwayat, Poin, Bantuan) ---
+                // --- QUICK ACTIONS (Iuran, Jadwal Ronda, Bantuan) ---
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Dompet Digital")),
+                            MaterialPageRoute(
+                              builder: (_) => const IuranView(),
+                            ),
                           );
                         },
-                        child: _buildQuickAction(
-                          Icons.account_balance_wallet,
-                          const Color(0xFF8B0000),
-                          const Color(0xFFFEF2F2),
-                          "Dompet",
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          if (widget.onNavigate != null) widget.onNavigate!(3);
-                        },
-                        child: _buildQuickAction(
-                          Icons.receipt_long,
-                          const Color(0xFF3B82F6),
-                          const Color(0xFFEFF6FF),
-                          "Riwayat",
+                        borderRadius: BorderRadius.circular(16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: _buildQuickAction(
+                            Icons.payments_outlined,
+                            const Color(0xFF8B0000),
+                            const Color(0xFFFEF2F2),
+                            "Iuran",
+                          ),
                         ),
                       ),
                       InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Poin WARTA")),
+                            MaterialPageRoute(
+                              builder: (_) => const JadwalRondaView(),
+                            ),
                           );
                         },
-                        child: _buildQuickAction(
-                          Icons.star,
-                          const Color(0xFFD97706),
-                          const Color(0xFFFEF3C7),
-                          "Poin",
+                        borderRadius: BorderRadius.circular(16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: _buildQuickAction(
+                            Icons.security_outlined,
+                            const Color(0xFF3B82F6),
+                            const Color(0xFFEFF6FF),
+                            "Jadwal Ronda",
+                          ),
                         ),
                       ),
                       InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Pusat Bantuan")),
+                            MaterialPageRoute(
+                              builder: (_) => const BantuanView(),
+                            ),
                           );
                         },
-                        child: _buildQuickAction(
-                          Icons.help_outline,
-                          const Color(0xFF16A34A),
-                          const Color(0xFFDCFCE7),
-                          "Bantuan",
+                        borderRadius: BorderRadius.circular(16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: _buildQuickAction(
+                            Icons.help_outline,
+                            const Color(0xFF16A34A),
+                            const Color(0xFFDCFCE7),
+                            "Bantuan",
+                          ),
                         ),
                       ),
                     ],
@@ -494,7 +624,11 @@ class _ProfilViewState extends State<ProfilView> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Informasi Pribadi")),
+                                  MaterialPageRoute(
+                                    builder: (_) => const ProfilDetailView(
+                                      menuName: "Edit Informasi Pribadi",
+                                    ),
+                                  ),
                                 );
                               },
                             ),
@@ -505,7 +639,11 @@ class _ProfilViewState extends State<ProfilView> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Ubah PIN Keamanan")),
+                                  MaterialPageRoute(
+                                    builder: (_) => const ProfilDetailView(
+                                      menuName: "Ubah PIN Keamanan",
+                                    ),
+                                  ),
                                 );
                               },
                             ),
@@ -561,7 +699,11 @@ class _ProfilViewState extends State<ProfilView> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => const ProfilDetailView(menuName: "Syarat & Ketentuan")),
+                                  MaterialPageRoute(
+                                    builder: (_) => const ProfilDetailView(
+                                      menuName: "Syarat & Ketentuan",
+                                    ),
+                                  ),
                                 );
                               },
                             ),
@@ -573,53 +715,119 @@ class _ProfilViewState extends State<ProfilView> {
                               onTap: () {
                                 showDialog(
                                   context: context,
-                                  barrierColor: Colors.black.withValues(alpha: 0.1),
+                                  barrierColor: Colors.black.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   builder: (context) => BackdropFilter(
-                                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                    filter: ImageFilter.blur(
+                                      sigmaX: 12,
+                                      sigmaY: 12,
+                                    ),
                                     child: Dialog(
                                       backgroundColor: Colors.transparent,
                                       elevation: 0,
                                       child: Container(
                                         padding: const EdgeInsets.all(24),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withValues(alpha: 0.6),
-                                          borderRadius: BorderRadius.circular(24),
-                                          border: Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.6,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            24,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                            width: 1.5,
+                                          ),
                                           boxShadow: [
-                                            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10)),
+                                            BoxShadow(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.05,
+                                              ),
+                                              blurRadius: 20,
+                                              offset: const Offset(0, 10),
+                                            ),
                                           ],
                                         ),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            const Text("Konfirmasi Logout", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
+                                            const Text(
+                                              "Konfirmasi Logout",
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
                                             const SizedBox(height: 12),
-                                            const Text("Apakah Anda yakin ingin keluar dari sesi aplikasi WARTA Anda saat ini?", textAlign: TextAlign.center, style: TextStyle(color: Colors.black54, fontSize: 13)),
+                                            const Text(
+                                              "Apakah Anda yakin ingin keluar dari sesi aplikasi WARTA Anda saat ini?",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 13,
+                                              ),
+                                            ),
                                             const SizedBox(height: 32),
                                             Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
                                               children: [
                                                 TextButton(
-                                                  onPressed: () => Navigator.pop(context),
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
                                                   style: TextButton.styleFrom(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 24,
+                                                          vertical: 12,
+                                                        ),
                                                   ),
-                                                  child: const Text("BATAL", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                                                  child: const Text(
+                                                    "BATAL",
+                                                    style: TextStyle(
+                                                      color: Colors.grey,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
                                                 ),
                                                 ElevatedButton(
                                                   style: ElevatedButton.styleFrom(
                                                     backgroundColor: primaryRed,
-                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            12,
+                                                          ),
+                                                    ),
                                                     elevation: 0,
-                                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 24,
+                                                          vertical: 12,
+                                                        ),
                                                   ),
                                                   onPressed: () {
                                                     Navigator.pushReplacement(
                                                       context,
-                                                      MaterialPageRoute(builder: (_) => const LoginView()),
+                                                      MaterialPageRoute(
+                                                        builder: (_) =>
+                                                            const LoginView(),
+                                                      ),
                                                     );
                                                   },
-                                                  child: const Text("KELUAR", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                                  child: const Text(
+                                                    "KELUAR",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -672,20 +880,20 @@ class _ProfilViewState extends State<ProfilView> {
     return Column(
       children: [
         Container(
-          width: 50,
-          height: 50,
+          width: 60, // Diperbesar dari 50
+          height: 60, // Diperbesar dari 50
           decoration: BoxDecoration(
             color: bgColor,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18), // Disesuaikan
           ),
-          child: Icon(icon, color: iconColor, size: 24),
+          child: Icon(icon, color: iconColor, size: 28), // Diperbesar dari 24
         ),
         const SizedBox(height: 8),
         Text(
           label,
           style: const TextStyle(
             color: textDark,
-            fontSize: 11,
+            fontSize: 12, // Diperbesar dari 11
             fontWeight: FontWeight.w600,
           ),
         ),

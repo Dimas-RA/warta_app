@@ -4,6 +4,7 @@ import '../report/lapor_view.dart';
 import '../darurat/darurat_view.dart';
 import '../berita/berita_view.dart';
 import '../../utils/top_notification.dart';
+import '../aktivitas/aktivitas_detail_view.dart';
 
 class HomeView extends StatefulWidget {
   final Function(int) onNavigate;
@@ -370,6 +371,7 @@ class _HomeViewState extends State<HomeView> {
                           greenSuccess,
                           bgSuccess,
                           "Verifikasi E-KTP",
+                          "Pengajuan disetujui",
                           "2 Jam yang lalu",
                           "BERHASIL",
                           greenSuccess,
@@ -385,6 +387,7 @@ class _HomeViewState extends State<HomeView> {
                           Colors.blue,
                           Colors.blue.withOpacity(0.1),
                           "Permohonan Surat",
+                          "Surat Keterangan Usaha",
                           "Kemarin, 14:20",
                           "PROSES",
                           yellowProcess,
@@ -517,6 +520,7 @@ class _HomeViewState extends State<HomeView> {
     Color iconColor,
     Color iconBg,
     String title,
+    String subtitle,
     String time,
     String status,
     Color statusColor,
@@ -524,17 +528,15 @@ class _HomeViewState extends State<HomeView> {
   ) {
     return InkWell(
       onTap: () {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("Detail $title"),
-            content: Text("Aktivitas ini diubah terakhir pada:\n$time\nStatus saat ini: $status"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("TUTUP", style: TextStyle(color: Color(0xFF8B0000))),
-              ),
-            ],
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AktivitasDetailView(
+              title: title,
+              subtitle: subtitle,
+              status: status,
+              time: time,
+            ),
           ),
         );
       },

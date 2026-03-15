@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/top_notification.dart';
 import 'aktivitas_detail_view.dart';
 
 class AktivitasView extends StatefulWidget {
@@ -192,7 +193,13 @@ class _AktivitasViewState extends State<AktivitasView> {
                           statusBg: bgSuccess,
                           time: "14:30 WIB",
                           actionText: "LIHAT DETAIL",
-                          onTap: () => _showDetailDialog(context, "Verifikasi E-KTP", "Identitas Kependudukan Digital", "BERHASIL", "14:30 WIB"),
+                          onTap: () => _showDetailDialog(
+                            context,
+                            "Verifikasi E-KTP",
+                            "Identitas Kependudukan Digital",
+                            "BERHASIL",
+                            "14:30 WIB",
+                          ),
                         ),
                       if ((_activeTabIndex == 0 || _activeTabIndex == 2) &&
                           (_activeTabIndex == 0 || _activeTabIndex == 1))
@@ -210,10 +217,23 @@ class _AktivitasViewState extends State<AktivitasView> {
                           statusColor: colorProcess,
                           statusBg: bgProcess,
                           time: "09:15 WIB",
-                          actionText: "LIHAT DETAIL",
+                          actionText: "INGATKAN ADMIN",
+                          onActionTap: () {
+                            TopNotification.show(
+                              context: context,
+                              message: "Pengingat berhasil dikirim ke Admin",
+                              isSuccess: true,
+                            );
+                          },
                           customContent:
                               _buildProgressIndicator(), // Indikator 1-2-3
-                          onTap: () => _showDetailDialog(context, "Permohonan SKCK", "Layanan Kepolisian", "PROSES", "09:15 WIB"),
+                          onTap: () => _showDetailDialog(
+                            context,
+                            "Permohonan SKCK",
+                            "Layanan Kepolisian",
+                            "PROSES",
+                            "09:15 WIB",
+                          ),
                         ),
                     ],
                   ),
@@ -254,7 +274,13 @@ class _AktivitasViewState extends State<AktivitasView> {
                       time: "16:45 WIB",
                       actionText: "AJUKAN ULANG",
                       actionColor: goldColor,
-                      onTap: () => _showDetailDialog(context, "Pengajuan KK Baru", "Dokumen Tidak Lengkap", "DITOLAK", "16:45 WIB"),
+                      onTap: () => _showDetailDialog(
+                        context,
+                        "Pengajuan KK Baru",
+                        "Dokumen Tidak Lengkap",
+                        "DITOLAK",
+                        "16:45 WIB",
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -270,6 +296,13 @@ class _AktivitasViewState extends State<AktivitasView> {
                       statusBg: bgSuccess,
                       time: "10:20 WIB",
                       actionText: "LIHAT TANGGAPAN",
+                      onTap: () => _showDetailDialog(
+                        context,
+                        "Laporan Jalan Rusak",
+                        "Pengaduan Masyarakat",
+                        "SELESAI",
+                        "10:20 WIB",
+                      ),
                     ),
                   ],
                 ),
@@ -282,45 +315,49 @@ class _AktivitasViewState extends State<AktivitasView> {
 
   // --- WIDGET HELPER ---
 
-  // Tombol Filter Tab di Header
+  // Tombol Filter Tab di Header dengan Animasi Transisi & Hover
   Widget _buildTabButton(String label, int index) {
     bool isActive = _activeTabIndex == index;
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         setState(() {
           _activeTabIndex = index;
         });
       },
-      child: Container(
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
         decoration: BoxDecoration(
-          // Jika aktif, gunakan gradasi yang sama dengan header
+          color: isActive ? Colors.red.withValues(alpha: 0.9) : Colors.white,
           gradient: isActive
               ? const LinearGradient(
                   colors: [Color(0xFF8B0000), Color.fromARGB(255, 83, 0, 0)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 )
-              : null, // Jika tidak aktif, tidak pakai gradasi
-          color: isActive
-              ? null
-              : Colors.white, // Jika tidak aktif, pakai putih
+              : null,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
+              color: isActive
+                  ? primaryRed.withOpacity(0.4)
+                  : Colors.black.withOpacity(0.05),
+              blurRadius: isActive ? 12 : 8,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Text(
-          label,
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
           style: TextStyle(
             color: isActive ? Colors.white : Colors.black87,
             fontWeight: FontWeight.bold,
             fontSize: 14,
           ),
+          child: Text(label),
         ),
       ),
     );
@@ -341,112 +378,122 @@ class _AktivitasViewState extends State<AktivitasView> {
     Color? actionColor, // Opsional, default merah marun
     Widget? customContent, // Untuk indikator 1-2-3 pada proses SKCK
     VoidCallback? onTap,
+    VoidCallback? onActionTap,
   }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Ikon
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: iconBg,
-                  borderRadius: BorderRadius.circular(12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: borderColor),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Ikon
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: iconBg,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: iconColor, size: 24),
                 ),
-                child: Icon(icon, color: iconColor, size: 24),
-              ),
-              const SizedBox(width: 16),
-              // Teks Judul & Subjudul
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: textDark,
+                const SizedBox(width: 16),
+                // Teks Judul & Subjudul
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: textDark,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(color: textGray, fontSize: 12),
-                    ),
-                    if (customContent != null) ...[
-                      const SizedBox(height: 12),
-                      customContent,
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(color: textGray, fontSize: 12),
+                      ),
+                      if (customContent != null) ...[
+                        const SizedBox(height: 12),
+                        customContent,
+                      ],
                     ],
-                  ],
-                ),
-              ),
-              // Label Status (Kanan Atas)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusBg,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  status,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Divider(color: bgApp, thickness: 1.5),
-          const SizedBox(height: 8),
-          // Baris Waktu & Aksi (Kanan Bawah)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                time,
-                style: const TextStyle(
-                  color: textLightGray,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
+                // Label Status (Kanan Atas)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusBg,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    status,
+                    style: TextStyle(
+                      color: statusColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ),
-              ),
-              Text(
-                actionText,
-                style: TextStyle(
-                  color: actionColor ?? primaryRed,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(color: bgApp, thickness: 1.5),
+            const SizedBox(height: 8),
+            // Baris Waktu & Aksi (Kanan Bawah)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  time,
+                  style: const TextStyle(
+                    color: textLightGray,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
+                InkWell(
+                  onTap: onActionTap,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    child: Text(
+                      actionText,
+                      style: TextStyle(
+                        color: actionColor ?? primaryRed,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -506,7 +553,13 @@ class _AktivitasViewState extends State<AktivitasView> {
     );
   }
 
-  void _showDetailDialog(BuildContext context, String title, String subtitle, String status, String time) {
+  void _showDetailDialog(
+    BuildContext context,
+    String title,
+    String subtitle,
+    String status,
+    String time,
+  ) {
     Navigator.push(
       context,
       MaterialPageRoute(
