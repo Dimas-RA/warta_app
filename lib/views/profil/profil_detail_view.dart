@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../utils/top_notification.dart';
+import '../../services/media_service.dart';
+import '../../services/ocr_service.dart';
 
 class ProfilDetailView extends StatefulWidget {
   final String menuName;
@@ -20,6 +23,62 @@ class _ProfilDetailViewState extends State<ProfilDetailView> {
   bool _pushNotification = true;
   bool _emailUpdates = false;
   bool _biometricAuth = true;
+
+  // OCR & Media Services
+  final MediaService _mediaService = MediaService();
+  final OcrService _ocrService = OcrService();
+  
+  // Controllers for Edit Profile Form
+  final TextEditingController _nikController = TextEditingController();
+  final TextEditingController _namaController = TextEditingController();
+  bool _isScanningKtp = false;
+
+  @override
+  void dispose() {
+    _ocrService.dispose();
+    _nikController.dispose();
+    _namaController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _scanKtp() async {
+    setState(() => _isScanningKtp = true);
+    
+    // 1. Buka Kamera
+    final File? image = await _mediaService.pickImageFromCamera();
+    if (image != null) {
+      // 2. Proses OCR
+      final String? text = await _ocrService.processImage(image);
+      
+      if (text != null && text.isNotEmpty) {
+        // Cari urutan 16 digit angka yang kemungkinan besar NIK
+        final RegExp nikRegex = RegExp(r'\b\d{16}\b');
+        final match = nikRegex.firstMatch(text);
+        
+        if (mounted) {
+          if (match != null) {
+            setState(() {
+              _nikController.text = match.group(0)!;
+            });
+            TopNotification.show(
+              context: context,
+              message: "NIK berhasil dipindai!",
+              isSuccess: true,
+            );
+          } else {
+            TopNotification.show(
+              context: context,
+              message: "KTP tidak terbaca jelas. Mohon foto ulang.",
+            );
+          }
+        }
+      }
+    }
+    
+    if (mounted) {
+      setState(() => _isScanningKtp = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,15 +187,7 @@ class _ProfilDetailViewState extends State<ProfilDetailView> {
     switch (menu) {
       case "Edit Informasi Pribadi":
       case "Informasi Pribadi": // Menjaga kompatibilitas jika masih ada yang pakai
-        return _buildForm(
-          [
-            "Nama Lengkap",
-            "NIK / No. KTP",
-            "Nomor Telepon",
-            "Email",
-            "Alamat Domisili"
-          ],
-        );
+        return _buildProfileForm();
       case "Ubah PIN Keamanan":
       case "Kata Sandi":
         return _buildForm(
@@ -175,6 +226,114 @@ class _ProfilDetailViewState extends State<ProfilDetailView> {
       default:
         return _buildTextContent(menu);
     }
+  }
+
+  Widget _buildProfileForm() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTextField("Nama Lengkap", controller: _namaController),
+          const SizedBox(height: 16),
+          
+          // Field NIK dengan Tombol Scan OCR
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _nikController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: "NIK / No. KTP",
+                    labelStyle: TextStyle(color: textGray),
+                    border: UnderlineInputBorder(),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: primaryRed, width: 2),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              InkWell(
+                onTap: _isScanningKtp ? null : _scanKtp,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: primaryRed.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: primaryRed.withOpacity(0.3)),
+                  ),
+                  child: _isScanningKtp 
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: primaryRed, strokeWidth: 2))
+                      : const Row(
+                          children: [
+                            Icon(Icons.document_scanner, color: primaryRed, size: 20),
+                            SizedBox(width: 8),
+                            Text("Scan NIK", style: TextStyle(color: primaryRed, fontWeight: FontWeight.bold, fontSize: 13)),
+                          ],
+                        ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          
+          _buildTextField("Nomor Telepon"),
+          const SizedBox(height: 16),
+          _buildTextField("Email"),
+          const SizedBox(height: 16),
+          _buildTextField("Alamat Domisili"),
+          const SizedBox(height: 32),
+          
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryRed,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () {
+                TopNotification.show(
+                  context: context,
+                  message: "Data berhasil disimpan",
+                  isSuccess: true,
+                );
+              },
+              child: const Text("Simpan Perubahan", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, {TextEditingController? controller, bool isPassword = false}) {
+    return TextField(
+      controller: controller,
+      obscureText: isPassword,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: textGray),
+        border: const UnderlineInputBorder(),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: primaryRed, width: 2),
+        ),
+      ),
+    );
   }
 
   Widget _buildForm(List<String> fields, {bool isPassword = false}) {

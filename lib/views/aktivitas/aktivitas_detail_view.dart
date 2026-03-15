@@ -22,13 +22,15 @@ class AktivitasDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isLaporan = title.toLowerCase().contains('pengaduan') || title.toLowerCase().contains('laporan');
+
     Color statusColor;
     Color statusBg;
 
-    if (status == "BERHASIL" || status == "SELESAI") {
+    if (status == "BERHASIL" || status == "SELESAI" || status == "LAPORAN DISELESAIKAN") {
       statusColor = const Color(0xFF10B981);
       statusBg = const Color(0xFFF0FDF4);
-    } else if (status == "PROSES") {
+    } else if (status == "PROSES" || status == "LAPORAN DITERIMA") {
       statusColor = const Color(0xFF3B82F6);
       statusBg = const Color(0xFFEFF6FF);
     } else {
@@ -192,47 +194,68 @@ class AktivitasDetailView extends StatelessWidget {
               // ==========================================
               // KONDISIONAL BERDASARKAN STATUS
               // ==========================================
-              if (status == "BERHASIL" || status == "SELESAI") ...[
+              if (status == "BERHASIL" || status == "SELESAI" || status == "LAPORAN DISELESAIKAN") ...[
                 const SizedBox(height: 32),
                 const Text("Tanggapan / Hasil", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textGray)),
                 const SizedBox(height: 12),
-                // Preview Dokumen Berhasil
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: Column(
-                    children: [
-                      const Icon(Icons.description, size: 40, color: Color(0xFF10B981)),
-                      const SizedBox(height: 12),
-                      Text("Dokumen_${title.replaceAll(' ', '_')}.pdf", style: const TextStyle(color: textDark, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 4),
-                      const Text("Ditandatangani Digital", style: TextStyle(color: textGray, fontSize: 12)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Tombol Download
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF10B981),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                if (isLaporan)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
                     ),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Mendownload dokumen..."), backgroundColor: Color(0xFF10B981)));
-                    },
-                    icon: const Icon(Icons.download, color: Colors.white),
-                    label: const Text("Download Surat (PDF)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: const Column(
+                      children: [
+                        Icon(Icons.check_circle_outline, size: 40, color: Color(0xFF10B981)),
+                        SizedBox(height: 12),
+                        Text("Laporan Telah Diselesaikan", style: TextStyle(color: textDark, fontWeight: FontWeight.w600)),
+                        SizedBox(height: 4),
+                        Text("Terima kasih atas partisipasi Anda", style: TextStyle(color: textGray, fontSize: 12)),
+                      ],
+                    ),
+                  )
+                else ...[
+                  // Preview Dokumen Berhasil
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.description, size: 40, color: Color(0xFF10B981)),
+                        const SizedBox(height: 12),
+                        Text("Dokumen_${title.replaceAll(' ', '_')}.pdf", style: const TextStyle(color: textDark, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 4),
+                        const Text("Ditandatangani Digital", style: TextStyle(color: textGray, fontSize: 12)),
+                      ],
+                    ),
                   ),
-                ),
-              ] else if (status == "DITOLAK") ...[
+                  const SizedBox(height: 24),
+                  // Tombol Download
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF10B981),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Mendownload dokumen..."), backgroundColor: Color(0xFF10B981)));
+                      },
+                      icon: const Icon(Icons.download, color: Colors.white),
+                      label: const Text("Download Surat (PDF)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ]
+              ] else if (status == "DITOLAK" || status == "LAPORAN TIDAK SESUAI") ...[
                 const SizedBox(height: 32),
                 // Kotak Alasan Penolakan
                 Container(
@@ -250,31 +273,38 @@ class AktivitasDetailView extends StatelessWidget {
                         children: [
                           const Icon(Icons.error_outline, color: Color(0xFFEF4444), size: 20),
                           const SizedBox(width: 8),
-                          const Text("Alasan Penolakan", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFB91C1C))),
+                          Text(isLaporan ? "Keterangan" : "Alasan Penolakan", style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFB91C1C))),
                         ],
                       ),
                       const SizedBox(height: 8),
                       // Mock text alasan
-                      const Text("Dokumen persyaratan KTP terlihat buram dan foto usaha tidak sesuai kriteria. Mohon lengkapi perbaikan.", style: TextStyle(color: Color(0xFF991B1B), fontSize: 13, height: 1.5)),
+                      Text(
+                        isLaporan 
+                          ? "Laporan tidak sesuai kriteria atau informasi yang diberikan kurang detail. Silakan hubungi RT/RW setempat." 
+                          : "Dokumen persyaratan KTP terlihat buram dan foto usaha tidak sesuai kriteria. Mohon lengkapi perbaikan.", 
+                        style: const TextStyle(color: Color(0xFF991B1B), fontSize: 13, height: 1.5)
+                      ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
-                // Tombol Ajukan Ulang
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryRed, // Merah Primary
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                if (!isLaporan) ...[
+                  const SizedBox(height: 24),
+                  // Tombol Ajukan Ulang
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryRed, // Merah Primary
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => SuratDetailView(title: title)));
+                      },
+                      child: const Text("Ajukan Ulang", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                     ),
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => SuratDetailView(title: title)));
-                    },
-                    child: const Text("Ajukan Ulang", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
-                ),
+                ]
               ] else ...[
                  // PROSES
                  const SizedBox(height: 32),
@@ -282,11 +312,14 @@ class AktivitasDetailView extends StatelessWidget {
                    width: double.infinity,
                    padding: const EdgeInsets.all(16),
                    decoration: BoxDecoration(color: const Color(0xFFEFF6FF), borderRadius: BorderRadius.circular(12)),
-                   child: const Row(
+                   child: Row(
                      children: [
-                       Icon(Icons.info_outline, color: Color(0xFF3B82F6), size: 20),
-                       SizedBox(width: 12),
-                       Expanded(child: Text("Pengajuan Anda sedang divalidasi oleh petugas kelurahan. Mohon menunggu.", style: TextStyle(color: Color(0xFF1E40AF), fontSize: 13))),
+                       const Icon(Icons.info_outline, color: Color(0xFF3B82F6), size: 20),
+                       const SizedBox(width: 12),
+                       Expanded(child: Text(
+                         isLaporan ? "Laporan Anda telah diterima dan sedang dalam tahap verifikasi oleh admin." : "Pengajuan Anda sedang divalidasi oleh petugas kelurahan. Mohon menunggu.", 
+                         style: const TextStyle(color: Color(0xFF1E40AF), fontSize: 13)
+                       )),
                      ],
                    ),
                  ),

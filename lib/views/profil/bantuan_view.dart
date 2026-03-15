@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../utils/top_notification.dart';
+import '../../services/bantuan_service.dart';
+import '../../models/faq_model.dart';
 
 class BantuanView extends StatelessWidget {
   const BantuanView({super.key});
@@ -158,10 +160,20 @@ class BantuanView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildFaqItem(context, "Bagaimana cara melaporkan masalah?", "Masuk ke menu Pengaduan, kemudian pilih kategori laporan (Keamanan, Kebersihan, Infrastruktur). Tuliskan detail laporan dan unggah foto bukti jika ada."),
-                  _buildFaqItem(context, "Kapan jadwal ronda akan diperbarui?", "Jadwal ronda diperbarui setiap akhir bulan oleh Ketua RT masing-masing dan akan disinkronisasi ke aplikasi pada tanggal 1."),
-                  _buildFaqItem(context, "Apa syarat pembuatan surat pengantar?", "Pastikan Anda melampirkan foto E-KTP dan Kartu Keluarga (KK). Untuk keperluan khusus, mungkin dibutuhkan dokumen tambahan sesuai jenis surat yang diajukan."),
-                  _buildFaqItem(context, "Kenapa akun saya belum diverifikasi?", "Proses verifikasi membutuhkan waktu 1-2 hari kerja karena tim admin RW akan mencocokkan NIK Anda dengan database kependudukan secara manual."),
+                  FutureBuilder<List<FaqModel>>(
+                    future: BantuanService().getFaqs(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator(color: primaryRed));
+                      }
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Text("Belum ada FAQ saat ini.", style: TextStyle(color: textGray));
+                      }
+                      return Column(
+                        children: snapshot.data!.map((faq) => _buildFaqItem(context, faq.question, faq.answer)).toList(),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

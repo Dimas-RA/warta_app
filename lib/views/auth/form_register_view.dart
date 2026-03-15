@@ -3,7 +3,8 @@ import 'package:dotted_border/dotted_border.dart';
 import 'photo_verif_view.dart';
 
 class FormRegistView extends StatefulWidget {
-  const FormRegistView({super.key});
+  final Map<String, String> prefilledData;
+  const FormRegistView({super.key, this.prefilledData = const {}});
 
   @override
   State<FormRegistView> createState() => _FormRegistViewState();
@@ -19,6 +20,33 @@ class _FormRegistViewState extends State<FormRegistView> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+  // Text Controllers
+  late final TextEditingController _nikCtrl;
+  late final TextEditingController _namaCtrl;
+  late final TextEditingController _ttlCtrl;
+  late final TextEditingController _alamatCtrl;
+
+  bool get _hasOcrData => widget.prefilledData.isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill dari hasil OCR jika ada
+    _nikCtrl = TextEditingController(text: widget.prefilledData['nik'] ?? '');
+    _namaCtrl = TextEditingController(text: widget.prefilledData['nama'] ?? '');
+    _ttlCtrl = TextEditingController(text: widget.prefilledData['ttl'] ?? '');
+    _alamatCtrl = TextEditingController(text: widget.prefilledData['alamat'] ?? '');
+  }
+
+  @override
+  void dispose() {
+    _nikCtrl.dispose();
+    _namaCtrl.dispose();
+    _ttlCtrl.dispose();
+    _alamatCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,11 +237,36 @@ class _FormRegistViewState extends State<FormRegistView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // --- Banner OCR Autofill ---
+                  if (_hasOcrData) ...
+                    [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDCFCE7),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.auto_awesome, color: Color(0xFF10B981), size: 16),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                "Data berhasil terbaca dari KTP. Harap periksa kembali sebelum melanjutkan.",
+                                style: TextStyle(color: Color(0xFF166534), fontSize: 12, height: 1.4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   // --- SECTION: IDENTITAS UTAMA ---
                   _buildSectionHeader(Icons.fingerprint, "IDENTITAS UTAMA"),
-                  _buildTextField("NIK", "3275012345678901"),
+                  _buildTextField("NIK", "", controller: _nikCtrl),
                   const SizedBox(height: 16),
-                  _buildTextField("NAMA LENGKAP", "BUDI SETIAWAN"),
+                  _buildTextField("NAMA LENGKAP", "", controller: _namaCtrl),
                   // Hint kecil di bawah nama
                   const Padding(
                     padding: EdgeInsets.only(top: 4, left: 4),
@@ -230,11 +283,11 @@ class _FormRegistViewState extends State<FormRegistView> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTextField("TEMPAT LAHIR", "JAKARTA"),
+                        child: _buildTextField("TEMPAT / TGL LAHIR", "", controller: _ttlCtrl),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: _buildTextField("TGL LAHIR", "17-08-1945"),
+                        child: _buildTextField("TGL LAHIR", ""),
                       ),
                     ],
                   ),
@@ -242,25 +295,25 @@ class _FormRegistViewState extends State<FormRegistView> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildDropdown("JENIS KELAMIN", "LAKI-LAKI"),
+                        child: _buildDropdown("JENIS KELAMIN", "-"),
                       ),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildTextField("GOL. DARAH", "O")),
+                      Expanded(child: _buildTextField("GOL. DARAH", "")),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  _buildTextField("AGAMA", "ISLAM"),
+                  _buildTextField("AGAMA", ""),
                   const SizedBox(height: 16),
-                  _buildDropdown("STATUS PERKAWINAN", "KAWIN"),
+                  _buildDropdown("STATUS PERKAWINAN", "-"),
                   const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTextField("KEWARGANEGARAAN", "WNI"),
+                        child: _buildTextField("KEWARGANEGARAAN", ""),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: _buildTextField("PEKERJAAN", "WIRAUSAHA"),
+                        child: _buildTextField("PEKERJAAN", ""),
                       ),
                     ],
                   ),
@@ -274,31 +327,32 @@ class _FormRegistViewState extends State<FormRegistView> {
                   ),
                   _buildTextField(
                     "ALAMAT",
-                    "JL. MAWAR MERAH NO. 123, RT 001/002",
+                    "",
                     maxLines: 3,
+                    controller: _alamatCtrl,
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Expanded(child: _buildTextField("RT", "001")),
+                      Expanded(child: _buildTextField("RT", "")),
                       const SizedBox(width: 16),
-                      Expanded(child: _buildTextField("RW", "002")),
+                      Expanded(child: _buildTextField("RW", "")),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTextField("KELURAHAN", "KALIMALANG"),
+                        child: _buildTextField("KELURAHAN", ""),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: _buildTextField("KECAMATAN", "BEKASI SELATAN"),
+                        child: _buildTextField("KECAMATAN", ""),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  _buildTextField("KABUPATEN/KOTA", "KOTA BEKASI"),
+                  _buildTextField("KABUPATEN/KOTA", ""),
 
                   const SizedBox(height: 32),
 
@@ -307,11 +361,11 @@ class _FormRegistViewState extends State<FormRegistView> {
                     Icons.account_circle_outlined,
                     "DATA AKUN",
                   ),
-                  _buildTextField("EMAIL", "budi.setiawan@email.com"),
+                  _buildTextField("EMAIL", ""),
                   const SizedBox(height: 16),
                   _buildTextField(
                     "BUAT PASSWORD",
-                    "password123",
+                    "",
                     isPassword: true,
                     isObscure: _obscurePassword,
                     onToggleObscure: () {
@@ -323,7 +377,7 @@ class _FormRegistViewState extends State<FormRegistView> {
                   const SizedBox(height: 16),
                   _buildTextField(
                     "KONFIRMASI PASSWORD",
-                    "password123",
+                    "",
                     isPassword: true,
                     isObscure: _obscureConfirmPassword,
                     onToggleObscure: () {
@@ -428,9 +482,11 @@ class _FormRegistViewState extends State<FormRegistView> {
     bool isPassword = false,
     bool? isObscure,
     VoidCallback? onToggleObscure,
+    TextEditingController? controller,
   }) {
     return TextFormField(
-      initialValue: initialValue,
+      controller: controller,
+      initialValue: controller == null ? initialValue : null,
       maxLines: maxLines,
       obscureText: isObscure ?? false,
       style: const TextStyle(color: textDark, fontSize: 14),

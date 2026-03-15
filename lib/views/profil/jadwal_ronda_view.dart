@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../models/profil_model.dart';
+import '../../services/profil_service.dart';
 
 class JadwalRondaView extends StatelessWidget {
   const JadwalRondaView({super.key});
@@ -8,11 +10,31 @@ class JadwalRondaView extends StatelessWidget {
   static const Color textDark = Color(0xFF0F172A);
   static const Color textGray = Color(0xFF64748B);
 
+  String _formatDate(DateTime date) {
+    const List<String> months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgApp,
-      body: SingleChildScrollView(
+      body: FutureBuilder<List<JadwalRondaModel>>(
+        future: KeamananService().getJadwalRonda(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: primaryRed));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("Tidak ada jadwal ronda"));
+          }
+          
+          final jadwalList = snapshot.data!;
+          final nextJadwal = jadwalList.first;
+          
+          return SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 60),
         child: Column(
           children: [
@@ -117,19 +139,19 @@ class JadwalRondaView extends StatelessWidget {
                       children: [
                         const Icon(Icons.notifications_active, color: Color(0xFFF97316)),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            "Anda mendapat giliran ronda pada hari Sabtu minggu ini. Harap hadir tepat waktu.",
-                            style: TextStyle(fontSize: 12, color: Color(0xFF9A3412)),
+                            "Anda mendapat giliran ronda pada hari ${nextJadwal.hari} terdekat. Harap hadir tepat waktu di ${nextJadwal.lokasi}.",
+                            style: const TextStyle(fontSize: 12, color: Color(0xFF9A3412)),
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
-                    "Jadwal Kelompok 3",
-                    style: TextStyle(
+                  Text(
+                    "Jadwal ${nextJadwal.regu}",
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: textGray,
@@ -137,16 +159,25 @@ class JadwalRondaView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildJadwalCard("Sabtu, 14 Maret 2026", "22:00 - 04:00 WIB", true),
-                  const SizedBox(height: 12),
-                  _buildJadwalCard("Sabtu, 21 Maret 2026", "22:00 - 04:00 WIB", false),
-                  const SizedBox(height: 12),
-                  _buildJadwalCard("Sabtu, 28 Maret 2026", "22:00 - 04:00 WIB", false),
+                  ...jadwalList.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final jadwal = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: _buildJadwalCard(
+                        "${jadwal.hari.split(' ')[0]}, ${_formatDate(jadwal.tanggal)}", 
+                        "22:00 - 04:00 WIB", // dummy
+                        index == 0
+                      ),
+                    );
+                  }).toList(),
                 ],
               ),
             ),
           ],
         ),
+      );
+        },
       ),
     );
   }

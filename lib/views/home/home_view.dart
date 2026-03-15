@@ -3,8 +3,14 @@ import 'package:flutter/material.dart';
 import '../report/lapor_view.dart';
 import '../darurat/darurat_view.dart';
 import '../berita/berita_view.dart';
+import '../berita/berita_detail_view.dart';
 import '../../utils/top_notification.dart';
 import '../aktivitas/aktivitas_detail_view.dart';
+import '../../models/berita_model.dart';
+import '../../services/berita_service.dart';
+import '../../services/berita_api_service.dart';
+import '../../models/aktivitas_model.dart';
+import '../../services/aktivitas_service.dart';
 
 class HomeView extends StatefulWidget {
   final Function(int) onNavigate;
@@ -23,10 +29,6 @@ class _HomeViewState extends State<HomeView> {
   static const Color textDark = Color(0xFF1F2937);
   static const Color textGray = Color(0xFF6B7280);
   static const Color goldColor = Color(0xFFD4AF37);
-  static const Color greenSuccess = Color(0xFF16A34A);
-  static const Color bgSuccess = Color(0xFFDCFCE7);
-  static const Color yellowProcess = Color(0xFFA16207);
-  static const Color bgProcess = Color(0xFFFEF9C3);
 
   @override
   Widget build(BuildContext context) {
@@ -363,37 +365,46 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       ],
                     ),
-                    child: Column(
-                      children: [
-                        _buildActivityItem(
-                          context, // Pass context here
-                          Icons.check_circle,
-                          greenSuccess,
-                          bgSuccess,
-                          "Verifikasi E-KTP",
-                          "Pengajuan disetujui",
-                          "2 Jam yang lalu",
-                          "BERHASIL",
-                          greenSuccess,
-                          bgSuccess,
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Divider(color: bgGray, thickness: 1.5),
-                        ),
-                        _buildActivityItem(
-                          context, // Pass context here
-                          Icons.description,
-                          Colors.blue,
-                          Colors.blue.withOpacity(0.1),
-                          "Permohonan Surat",
-                          "Surat Keterangan Usaha",
-                          "Kemarin, 14:20",
-                          "PROSES",
-                          yellowProcess,
-                          bgProcess,
-                        ),
-                      ],
+                    child: FutureBuilder<List<AktivitasModel>>(
+                      future: AktivitasService().getRecentAktivitas(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator(color: primaryRed));
+                        }
+                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return const Center(child: Text("Belum ada aktivitas."));
+                        }
+
+                        final items = snapshot.data!;
+                        return Column(
+                          children: items.asMap().entries.map((entry) {
+                            int idx = entry.key;
+                            AktivitasModel item = entry.value;
+                            
+                            return Column(
+                              children: [
+                                _buildActivityItem(
+                                  context,
+                                  IconData(item.iconCodePoint, fontFamily: item.iconFontFamily),
+                                  item.iconColor,
+                                  item.iconBgColor,
+                                  item.title,
+                                  item.subtitle,
+                                  item.date,
+                                  item.status,
+                                  item.statusTextColor,
+                                  item.statusBgColor,
+                                ),
+                                if (idx < items.length - 1)
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 12),
+                                    child: Divider(color: bgGray, thickness: 1.5),
+                                  ),
+                              ],
+                            );
+                          }).toList(),
+                        );
+                      }
                     ),
                   ),
                 ],
@@ -405,54 +416,80 @@ class _HomeViewState extends State<HomeView> {
             // 4. BANNER INFORMASI PUBLIK
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: InkWell(
+              child: FutureBuilder<BeritaModel?>(
+                future: BeritaApiService().getLatestHeadline().then((v) async {
+                  // If API returns null, fallback to dummy
+                  return v ?? await BeritaService().getLatestHeadline();
+                }),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                      width: double.infinity,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Center(child: CircularProgressIndicator(color: primaryRed)),
+                    );
+                  }
+                  if (!snapshot.hasData) return const SizedBox();
+                  
+                  final berita = snapshot.data!;
+                  // Determine background: use imageUrl from API or fallback to local asset
+                  final ImageProvider bgImage = (berita.imageUrl != null && berita.imageUrl!.isNotEmpty)
+                      ? NetworkImage(berita.imageUrl!) as ImageProvider
+                      : AssetImage(berita.imagePath);
+                  return InkWell(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const BeritaView()),
+                        MaterialPageRoute(builder: (_) => BeritaDetailView(berita: berita)),
                       );
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: primaryRed, // Warna dasar merah
-                    borderRadius: BorderRadius.circular(16),
-                    // PERUBAHAN: Background efek kota transparan
-                    image: DecorationImage(
-                      image: const AssetImage('assets/images/city_bg.webp'),
-                      fit: BoxFit.cover,
-                      colorFilter: ColorFilter.mode(
-                        primaryRed.withOpacity(0.3),
-                        BlendMode.dstATop,
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: primaryRed, // Warna dasar merah
+                        borderRadius: BorderRadius.circular(16),
+                        // PERUBAHAN: Background efek kota transparan
+                        image: DecorationImage(
+                          image: bgImage,
+                          fit: BoxFit.cover,
+                          colorFilter: ColorFilter.mode(
+                            primaryRed.withOpacity(0.3),
+                            BlendMode.dstATop,
+                          ),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            berita.category,
+                            style: const TextStyle(
+                              color: goldColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            berita.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "INFORMASI PUBLIK",
-                        style: TextStyle(
-                          color: goldColor,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Vaksinasi Massal\nKecamatan Merdeka",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                  );
+                }
               ),
             ),
           ],

@@ -5,6 +5,8 @@ import 'iuran_view.dart';
 import 'jadwal_ronda_view.dart';
 import 'bantuan_view.dart';
 import 'dart:ui';
+import '../../models/profil_model.dart';
+import '../../services/profil_service.dart';
 
 const Color primaryRed = Color(0xFF8B0000);
 const Color bgApp = Color(0xFFF8F9FA);
@@ -112,10 +114,28 @@ class _ProfilViewState extends State<ProfilView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bgApp,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 60),
+    return FutureBuilder<UserModel>(
+      future: UserService().getUserProfile(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            backgroundColor: bgApp,
+            body: Center(child: CircularProgressIndicator(color: primaryRed)),
+          );
+        }
+        
+        final user = snapshot.data;
+        if (user == null) {
+          return const Scaffold(
+             backgroundColor: bgApp,
+             body: Center(child: Text("Data pengguna tidak ditemukan.")),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: bgApp,
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 60),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -269,9 +289,9 @@ class _ProfilViewState extends State<ProfilView> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Ahmad Syarifuddin",
-                            style: TextStyle(
+                          Text(
+                            user.nama,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -279,7 +299,7 @@ class _ProfilViewState extends State<ProfilView> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "NIK: 3174*********0001",
+                            "NIK: ${user.nik.replaceRange(4, 12, '********')}",
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
                               fontSize: 12,
@@ -298,17 +318,17 @@ class _ProfilViewState extends State<ProfilView> {
                                 color: goldColor.withOpacity(0.5),
                               ),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.verified_user,
                                   color: goldColor,
                                   size: 12,
                                 ),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Text(
-                                  "TERVERIFIKASI",
-                                  style: TextStyle(
+                                  user.role.toUpperCase(),
+                                  style: const TextStyle(
                                     color: goldColor,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
@@ -387,9 +407,9 @@ class _ProfilViewState extends State<ProfilView> {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Column(
+                                const Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
+                                  children: [
                                     Text(
                                       "REPUBLIK INDONESIA",
                                       style: TextStyle(
@@ -419,9 +439,9 @@ class _ProfilViewState extends State<ProfilView> {
                                 color: Colors.white.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: const Text(
-                                "PROVINSI DKI\nJAKARTA",
-                                style: TextStyle(
+                              child: Text(
+                                user.domisili.toUpperCase(),
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 8,
                                 ),
@@ -435,9 +455,9 @@ class _ProfilViewState extends State<ProfilView> {
                           "NOMOR INDUK KEPENDUDUKAN",
                           style: TextStyle(color: Colors.white70, fontSize: 9),
                         ),
-                        const Text(
-                          "3174 0524 0991 0001",
-                          style: TextStyle(
+                        Text(
+                          user.nik.replaceAllMapped(RegExp(r".{4}"), (match) => "${match.group(0)} "),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -865,6 +885,8 @@ class _ProfilViewState extends State<ProfilView> {
           ],
         ),
       ),
+    );
+      }
     );
   }
 

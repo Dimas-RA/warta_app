@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../models/profil_model.dart';
+import '../../services/profil_service.dart';
+import '../../utils/top_notification.dart';
 
 class IuranView extends StatelessWidget {
   const IuranView({super.key});
@@ -9,11 +12,46 @@ class IuranView extends StatelessWidget {
   static const Color textGray = Color(0xFF64748B);
   static const Color goldColor = Color(0xFFD4AF37);
 
+  String _formatRupiah(int nominal) {
+    String str = nominal.toString();
+    String result = "";
+    int count = 0;
+    for (int i = str.length - 1; i >= 0; i--) {
+      result = str[i] + result;
+      count++;
+      if (count % 3 == 0 && i != 0) {
+        result = ".$result";
+      }
+    }
+    return "Rp $result";
+  }
+
+  String _formatDate(DateTime date) {
+    const List<String> months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgApp,
-      body: SingleChildScrollView(
+      body: FutureBuilder<List<IuranModel>>(
+        future: KeuanganService().getRiwayatIuran(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: primaryRed));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("Tidak ada data iuran."));
+          }
+          
+          final iuranList = snapshot.data!;
+          final tagihanBelumBayar = iuranList.where((i) => i.status == "BELUM DIBAYAR").toList();
+          final riwayatLunas = iuranList.where((i) => i.status == "LUNAS").toList();
+          
+          return SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 60),
         child: Column(
           children: [
@@ -117,83 +155,98 @@ class IuranView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFF1F5F9)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.02),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Iuran Kebersihan & Keamanan",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: textDark,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFEF2F2),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Text(
-                                "BELUM BAYAR",
+                  if (tagihanBelumBayar.isNotEmpty) ...[
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFF1F5F9)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.02),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Iuran Kebersihan & Keamanan",
                                 style: TextStyle(
-                                  color: primaryRed,
-                                  fontSize: 10,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
+                                  color: textDark,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          "Periode: Maret 2026",
-                          style: TextStyle(color: textGray, fontSize: 13),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          "Rp 50.000",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: primaryRed,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 44,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryRed,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFEF2F2),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  tagihanBelumBayar.first.status,
+                                  style: const TextStyle(
+                                    color: primaryRed,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
-                            onPressed: () {},
-                            child: const Text("Bayar Sekarang", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            ],
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 12),
+                          Text(
+                            "Periode: ${tagihanBelumBayar.first.bulan} ${tagihanBelumBayar.first.tahun}",
+                            style: const TextStyle(color: textGray, fontSize: 13),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _formatRupiah(tagihanBelumBayar.first.nominal),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: primaryRed,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 44,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryRed,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () {
+                                TopNotification.show(
+                                  context: context,
+                                  message: "Sedang mengalihkan ke Payment Gateway...",
+                                  isSuccess: true,
+                                );
+                              },
+                              child: const Text("Bayar Sekarang", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ] else ...[
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text("Tidak ada tagihan bulan ini", style: TextStyle(color: textGray)),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 32),
                   const Text(
                     "Riwayat Pembayaran",
@@ -205,19 +258,32 @@ class IuranView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildRiwayatCard("Februari 2026", "28 Feb 2026", "LUNAS"),
-                  const SizedBox(height: 12),
-                  _buildRiwayatCard("Januari 2026", "25 Jan 2026", "LUNAS"),
+                  if (riwayatLunas.isEmpty)
+                    const Center(child: Padding(padding: EdgeInsets.all(16.0), child: Text("Belum ada riwayat pembayaran", style: TextStyle(color: textGray))))
+                  else
+                    ...riwayatLunas.map((iuran) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: _buildRiwayatCard(
+                          "${iuran.bulan} ${iuran.tahun}",
+                          iuran.tanggalBayar != null ? _formatDate(iuran.tanggalBayar!) : "-",
+                          iuran.status,
+                          iuran.nominal,
+                        ),
+                      );
+                    }).toList(),
                 ],
               ),
             ),
           ],
         ),
+      );
+        },
       ),
     );
   }
 
-  Widget _buildRiwayatCard(String bulan, String tanggal, String status) {
+  Widget _buildRiwayatCard(String bulan, String tanggal, String status, int nominal) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -256,7 +322,7 @@ class IuranView extends StatelessWidget {
             ],
           ),
           Text(
-            "Rp 50.000",
+            _formatRupiah(nominal),
             style: const TextStyle(fontWeight: FontWeight.bold, color: textDark, fontSize: 14),
           ),
         ],

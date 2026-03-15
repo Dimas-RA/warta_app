@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import '../../utils/top_notification.dart';
+import '../../models/darurat_model.dart';
+import '../../services/darurat_service.dart';
 
 class DaruratView extends StatefulWidget {
   const DaruratView({super.key});
@@ -227,14 +229,114 @@ class _DaruratViewState extends State<DaruratView>
                     ),
 
                   if (_isCancelled)
-                    const Text(
-                      "Darurat dibatalkan.",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 20),
+                      child: Text(
+                        "Darurat dibatalkan.",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
+                    
+                  // LIST KONTAK DARURAT
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Kontak Instansi Penting",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1F2937),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: FutureBuilder<List<KontakDaruratModel>>(
+                              future: DaruratService().getKontakDarurat(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator(color: Color.fromARGB(255, 100, 0, 0)));
+                                }
+                                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                  return const Center(child: Text("Tidak ada data kontak darurat."));
+                                }
+                                
+                                return ListView.builder(
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index) {
+                                    final kontak = snapshot.data![index];
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(color: Colors.grey[200]!),
+                                      ),
+                                      child: ListTile(
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        leading: Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromARGB(255, 100, 0, 0).withOpacity(0.1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            IconData(kontak.iconCodePoint, fontFamily: kontak.iconFontFamily),
+                                            color: const Color.fromARGB(255, 100, 0, 0),
+                                          ),
+                                        ),
+                                        title: Text(
+                                          kontak.namaInstansi,
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        ),
+                                        subtitle: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(height: 4),
+                                            Text(kontak.jenisLayanan, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Icon(Icons.location_on, size: 14, color: Colors.grey[400]),
+                                                const SizedBox(width: 4),
+                                                Text(kontak.jarak, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        trailing: IconButton(
+                                          icon: const Icon(Icons.call, color: Colors.green),
+                                          onPressed: () {
+                                            TopNotification.show(
+                                              context: context,
+                                              message: "Memanggil ${kontak.nomorTelepon}...",
+                                              isSuccess: true,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

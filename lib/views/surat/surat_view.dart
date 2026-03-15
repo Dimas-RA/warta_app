@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../utils/top_notification.dart';
 import 'surat_detail_view.dart';
-
 import 'surat_category_view.dart';
+
+import '../../models/surat_model.dart';
+import '../../services/surat_service.dart';
 
 class SuratView extends StatefulWidget {
   final Function(int) onNavigate;
@@ -451,45 +453,32 @@ class _SuratViewState extends State<SuratView> {
 
   // Fungsi dinamis mengambil 3 data pertama acak dari mock data surat
   Widget _buildPopularItems() {
-    List<Map<String, dynamic>> popularList = [];
-    var sourceData = SuratCategoryView.suratMockData;
+    return FutureBuilder<List<SuratModel>>(
+      future: SuratService().getPopularSurat(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(20.0),
+              child: CircularProgressIndicator(color: Color(0xFF8B0000)),
+            ),
+          );
+        }
+        if (!snapshot.hasData || snapshot.data!.isEmpty) return const SizedBox();
 
-    // Ambil 3 sampel teratas sebagai "Paling sering diakses"
-    if (sourceData.containsKey("Administrasi") &&
-        sourceData["Administrasi"]!.length >= 2) {
-      popularList.add({
-        "title": sourceData["Administrasi"]![0]["title"]!,
-        "cat": "Administrasi",
-        "icon": Icons.home,
-      });
-    }
-    if (sourceData.containsKey("Perizinan") &&
-        sourceData["Perizinan"]!.isNotEmpty) {
-      popularList.add({
-        "title": sourceData["Perizinan"]![0]["title"]!,
-        "cat": "Perizinan",
-        "icon": Icons.storefront,
-      });
-    }
-    if (sourceData.containsKey("Keterangan") &&
-        sourceData["Keterangan"]!.isNotEmpty) {
-      popularList.add({
-        "title": sourceData["Keterangan"]![0]["title"]!,
-        "cat": "Keterangan",
-        "icon": Icons.volunteer_activism,
-      });
-    }
-
-    return Column(
-      children: popularList.map((item) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: InkWell(
-            onTap: () => _showSuratDialog(context, item["title"]),
-            child: _buildPopularItem(item["icon"], item["title"], item["cat"]),
-          ),
+        final popularList = snapshot.data!;
+        return Column(
+          children: popularList.map((item) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: InkWell(
+                onTap: () => _showSuratDialog(context, item.title),
+                child: _buildPopularItem(item.icon, item.title, item.category),
+              ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      }
     );
   }
 

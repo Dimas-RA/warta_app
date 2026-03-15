@@ -1,9 +1,19 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../utils/top_notification.dart';
+import '../../services/media_service.dart';
+import '../../services/location_service.dart';
+import 'package:geolocator/geolocator.dart';
 
-class LaporView extends StatelessWidget {
+class LaporView extends StatefulWidget {
   const LaporView({super.key});
 
+  @override
+  State<LaporView> createState() => _LaporViewState();
+}
+
+class _LaporViewState extends State<LaporView> {
   // Warna Konsisten WARTA
   static const Color primaryRed = Color(0xFF8B0000);
   static const Color primaryRedDark = Color(0xFF921515); // Warna tombol kirim
@@ -12,6 +22,37 @@ class LaporView extends StatelessWidget {
   static const Color textGray = Color(0xFF94A3B8);
   static const Color goldColor = Color(0xFFD4AF37);
   static const Color borderColor = Color(0xFFE2E8F0);
+
+  final MediaService _mediaService = MediaService();
+  final LocationService _locationService = LocationService();
+  
+  File? _selectedImage;
+  Position? _currentPosition;
+  bool _isLoadingLocation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLocation();
+  }
+
+  Future<void> _fetchLocation() async {
+    setState(() => _isLoadingLocation = true);
+    final pos = await _locationService.getCurrentLocation();
+    if (mounted) {
+      setState(() {
+        _currentPosition = pos;
+        _isLoadingLocation = false;
+      });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final image = await _mediaService.pickImageFromCamera();
+    if (image != null && mounted) {
+      setState(() => _selectedImage = image);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,44 +146,64 @@ class LaporView extends StatelessWidget {
                     left: 24,
                     right: 24,
                     child: GestureDetector(
-                      onTap: () {
-                        // TODO: Logika buka kamera (CameraX / FR-23)
-                      },
+                      onTap: _pickImage,
                       child: Container(
                         height: 200,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: goldColor, width: 1.5), // Border Emas
+                          border: Border.all(color: goldColor, width: 1.5),
                           boxShadow: [
                             BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5)),
                           ],
+                          image: _selectedImage != null
+                              ? DecorationImage(
+                                  image: kIsWeb ? NetworkImage(_selectedImage!.path) : FileImage(_selectedImage!) as ImageProvider,
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Ikon Kamera Merah + Lingkaran Transparan
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: primaryRed.withOpacity(0.1),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: primaryRed.withOpacity(0.2)),
+                        child: _selectedImage == null
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: primaryRed.withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: primaryRed.withOpacity(0.2)),
+                                    ),
+                                    child: const Icon(Icons.camera_alt, color: primaryRed, size: 36),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  const Text(
+                                    "Ambil Foto Bukti",
+                                    style: TextStyle(color: primaryRed, fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    "(Kamera Langsung)",
+                                    style: TextStyle(color: textGray, fontSize: 12),
+                                  ),
+                                ],
+                              )
+                            : Stack(
+                                children: [
+                                  Positioned(
+                                    right: 8,
+                                    top: 8,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.edit, color: Colors.white, size: 20),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              child: const Icon(Icons.camera_alt, color: primaryRed, size: 36),
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              "Ambil Foto Bukti",
-                              style: TextStyle(color: primaryRed, fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              "(Kamera Langsung)",
-                              style: TextStyle(color: textGray, fontSize: 12),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                   ),
@@ -214,10 +275,20 @@ class LaporView extends StatelessWidget {
                       const Icon(Icons.location_on_outlined, color: primaryRed, size: 16),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: Text(
-                          "Lokasi dan Waktu akan dicatat secara otomatis\n(Geotagging)",
-                          style: TextStyle(color: textDark.withOpacity(0.7), fontSize: 11, height: 1.5),
-                        ),
+                        child: _isLoadingLocation
+                            ? const Text(
+                                "Sedang mengambil koordinat lokasi...",
+                                style: TextStyle(color: textGray, fontSize: 11, fontStyle: FontStyle.italic),
+                              )
+                            : _currentPosition != null
+                                ? Text(
+                                    "Lokasi Tercatat: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}",
+                                    style: const TextStyle(color: primaryRed, fontSize: 11, fontWeight: FontWeight.w600),
+                                  )
+                                : Text(
+                                    "Gagal mendapatkan lokasi. Pastikan GPS aktif.",
+                                    style: TextStyle(color: textDark.withOpacity(0.7), fontSize: 11),
+                                  ),
                       ),
                     ],
                   ),

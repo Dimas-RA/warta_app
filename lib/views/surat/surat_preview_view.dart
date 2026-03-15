@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../utils/top_notification.dart';
+import '../../models/surat_model.dart';
+import '../../services/surat_service.dart';
 
 class SuratPreviewView extends StatefulWidget {
   final String title;
@@ -30,32 +32,29 @@ class _SuratPreviewViewState extends State<SuratPreviewView> {
   }
 
   // Helper untuk membuat teks surat dinamis berdasarkan jenis surat
-  String _generateDynamicBody(String title) {
-    String t = title.toLowerCase();
+  String _generateBody(String? template) {
     String intro = "Yang bertanda tangan di bawah ini, Kepala Kelurahan Maju, Kecamatan Waru, Kota Surabaya, dengan ini menerangkan bahwa:\n\n";
     String userData = "Nama: Yasman Yazid\nNIK: 35780123456789\nAlamat: Jl. Raya Maju No. 123, RT 05 RW 02\n\n";
-    
-    String explanation = "";
-    if (t.contains("usaha") || t.contains("sku") || t.contains("situ")) {
-      explanation = "Bahwa oknum/warga tersebut di atas benar-benar memiliki usaha dagang (Warung Sembako Berkah) yang berlokasi di kecamatan ini. Surat ini diterbitkan untuk keperluan administrasi perbankan/izin usaha lanjutan.";
-    } else if (t.contains("pindah")) {
-      explanation = "Bahwa oknum/warga tersebut bermaksud mengajukan pindah domisili mengikuti keluarga ke Alamat Tujuan baru. Catatan administrasi kependudukan telah diverifikasi.";
-    } else if (t.contains("tidak mampu") || t.contains("sktm")) {
-      explanation = "Berdasarkan catatan kelurahan, warga tersebut memang berpenghasilan di bawah rata-rata (UMR) dan tergolong keluarga kurang mampu. Surat ini diterbitkan sebagai pengantar pendaftaran sekolah/bantuan sosial.";
-    } else {
-      explanation = "Bahwa warga dengan data di atas telah divalidasi tercatat kependudukannya di sistem Kelurahan. Demikian surat keterangan ini dibuat untuk dipergunakan sebagaimana mestinya.";
-    }
+    String explanation = template ?? "Menerangkan bahwa individu di atas adalah benar warga Kelurahan Maju dan bermaksud mengurus keperluan administrasi sesuai ketentuan. Demikian surat ini dibuat agar dapat dipergunakan sebagaimana mestinya.";
 
-    return intro + userData + "Adalah benar-benar terdaftar dan divalidasi oleh sistem kelurahan kami.\n\n" + explanation;
+    return intro + userData + explanation;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgApp,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
+      body: FutureBuilder<SuratModel?>(
+        future: SuratService().getSuratByTitle(widget.title),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+             return const Center(child: CircularProgressIndicator());
+          }
+          final surat = snapshot.data;
+          
+          return Stack(
+            children: [
+              SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 100), // Spasi tombol
             child: Column(
               children: [
@@ -194,7 +193,7 @@ class _SuratPreviewViewState extends State<SuratPreviewView> {
 
                         // ISI SURAT (DINAMIS TRANSLASI FORM KE TEKS DOC)
                         Text(
-                          _generateDynamicBody(widget.title),
+                          _generateBody(surat?.templateKonten),
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.black87,
@@ -279,7 +278,8 @@ class _SuratPreviewViewState extends State<SuratPreviewView> {
             ),
           ),
         ],
-      ),
+      );
+    }),
     );
   }
 }

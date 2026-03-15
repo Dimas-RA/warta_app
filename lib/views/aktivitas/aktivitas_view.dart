@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../utils/top_notification.dart';
 import 'aktivitas_detail_view.dart';
+import '../../models/aktivitas_model.dart';
+import '../../services/aktivitas_service.dart';
 
 class AktivitasView extends StatefulWidget {
   const AktivitasView({super.key});
@@ -12,7 +14,7 @@ class AktivitasView extends StatefulWidget {
 class _AktivitasViewState extends State<AktivitasView> {
   int _activeTabIndex = 0; // 0: Semua, 1: Menunggu, 2: Selesai
 
-  // Warna Konsisten WARTA
+  // Tema Warna Konsisten WARTA
   static const Color primaryRed = Color(0xFF8B0000);
   static const Color bgApp = Color(0xFFF8FAFC);
   static const Color textDark = Color(0xFF0F172A);
@@ -20,14 +22,6 @@ class _AktivitasViewState extends State<AktivitasView> {
   static const Color textLightGray = Color(0xFF94A3B8);
   static const Color goldColor = Color(0xFFD4AF37);
   static const Color borderColor = Color(0xFFF1F5F9);
-
-  // Warna Status
-  static const Color colorSuccess = Color(0xFF10B981);
-  static const Color bgSuccess = Color(0xFFF0FDF4);
-  static const Color colorProcess = Color(0xFF3B82F6);
-  static const Color bgProcess = Color(0xFFEFF6FF);
-  static const Color colorReject = Color(0xFFEF4444);
-  static const Color bgReject = Color(0xFFFEF2F2);
 
   @override
   Widget build(BuildContext context) {
@@ -153,160 +147,96 @@ class _AktivitasViewState extends State<AktivitasView> {
             ),
 
             const SizedBox(height: 24),
+            const SizedBox(height: 24),
             // ==========================================
-            // 2. KELOMPOK: HARI INI
+            // DAFTAR AKTIVITAS DINAMIS DARI SERVICE
             // ==========================================
-            if (_activeTabIndex == 0 ||
-                _activeTabIndex == 1 ||
-                _activeTabIndex == 2)
-              if (_activeTabIndex != 2 ||
-                  true) // Memastikan header selalu menyesuaikan isi, tapi kalau 2 masih ada item HARI INI (Verifikasi)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_activeTabIndex == 0 ||
-                          _activeTabIndex == 1 ||
-                          _activeTabIndex == 2)
-                        const Text(
-                          "HARI INI",
-                          style: TextStyle(
-                            color: textLightGray,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.1,
-                          ),
-                        ),
-                      const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: FutureBuilder<List<AktivitasModel>>(
+                future: AktivitasService().getAktivitasList(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(32.0),
+                        child: CircularProgressIndicator(color: primaryRed),
+                      )
+                    );
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("Belum ada aktivitas."));
+                  }
 
-                      // Item 1: Verifikasi E-KTP (Berhasil)
-                      if (_activeTabIndex == 0 || _activeTabIndex == 2)
-                        _buildActivityCard(
-                          icon: Icons.check_circle,
-                          iconColor: colorSuccess,
-                          iconBg: bgSuccess,
-                          title: "Verifikasi E-KTP",
-                          subtitle: "Identitas Kependudukan Digital",
-                          status: "BERHASIL",
-                          statusColor: colorSuccess,
-                          statusBg: bgSuccess,
-                          time: "14:30 WIB",
-                          actionText: "LIHAT DETAIL",
-                          onTap: () => _showDetailDialog(
-                            context,
-                            "Verifikasi E-KTP",
-                            "Identitas Kependudukan Digital",
-                            "BERHASIL",
-                            "14:30 WIB",
-                          ),
-                        ),
-                      if ((_activeTabIndex == 0 || _activeTabIndex == 2) &&
-                          (_activeTabIndex == 0 || _activeTabIndex == 1))
-                        const SizedBox(height: 16),
+                  // Filter logic based on active tab
+                  List<AktivitasModel> allItems = snapshot.data!;
+                  List<AktivitasModel> filteredItems = allItems.where((item) {
+                    if (_activeTabIndex == 0) return true; // Semua
+                    if (_activeTabIndex == 1) return item.status == "PROSES"; // Menunggu
+                    if (_activeTabIndex == 2) return item.status == "BERHASIL" || item.status == "SELESAI"; // Selesai
+                    return false;
+                  }).toList();
 
-                      // Item 2: Permohonan SKCK (Proses) dengan indikator tahapan
-                      if (_activeTabIndex == 0 || _activeTabIndex == 1)
-                        _buildActivityCard(
-                          icon: Icons.description,
-                          iconColor: colorProcess,
-                          iconBg: bgProcess,
-                          title: "Permohonan SKCK",
-                          subtitle: "Layanan Kepolisian",
-                          status: "PROSES",
-                          statusColor: colorProcess,
-                          statusBg: bgProcess,
-                          time: "09:15 WIB",
-                          actionText: "INGATKAN ADMIN",
-                          onActionTap: () {
+                  // Sort or group logic could be applied here. For now, we list them directly.
+                  if (filteredItems.isEmpty) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(32.0),
+                        child: Text("Tidak ada aktivitas di kategori ini.", style: TextStyle(color: textGray)),
+                      )
+                    );
+                  }
+
+                  return Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: filteredItems.map((item) {
+                       // Menentukan custom handler untuk "INGATKAN ADMIN" jika PROSES
+                       String actionText = item.status == "PROSES" ? "INGATKAN ADMIN" : "LIHAT DETAIL";
+                       VoidCallback? actionCallback;
+                       
+                       if (item.status == "PROSES") {
+                         actionCallback = () {
                             TopNotification.show(
                               context: context,
                               message: "Pengingat berhasil dikirim ke Admin",
                               isSuccess: true,
                             );
-                          },
-                          customContent:
-                              _buildProgressIndicator(), // Indikator 1-2-3
-                          onTap: () => _showDetailDialog(
-                            context,
-                            "Permohonan SKCK",
-                            "Layanan Kepolisian",
-                            "PROSES",
-                            "09:15 WIB",
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+                         };
+                       } else if (item.status == "DITOLAK") {
+                         actionText = "AJUKAN ULANG";
+                         actionCallback = () => _showDetailDialog(context, item.title, item.subtitle, item.status, item.date);
+                       }
 
-            const SizedBox(height: 32),
+                       // Custom indikator khusus untuk "Permohonan SKCK" bisa ditambahkan jika nama title sesuai
+                       Widget? customContent;
+                       if (item.title == "Permohonan SKCK" && item.status == "PROSES") {
+                         customContent = _buildProgressIndicator();
+                       }
 
-            // ==========================================
-            // 3. KELOMPOK: KEMARIN
-            // ==========================================
-            if (_activeTabIndex == 0 || _activeTabIndex == 2)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "KEMARIN",
-                      style: TextStyle(
-                        color: textLightGray,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Item 3: Pengajuan KK Baru (Ditolak)
-                    _buildActivityCard(
-                      icon: Icons.cancel,
-                      iconColor: colorReject,
-                      iconBg: bgReject,
-                      title: "Pengajuan KK Baru",
-                      subtitle: "Dokumen Tidak Lengkap",
-                      status: "DITOLAK",
-                      statusColor: colorReject,
-                      statusBg: bgReject,
-                      time: "16:45 WIB",
-                      actionText: "AJUKAN ULANG",
-                      actionColor: goldColor,
-                      onTap: () => _showDetailDialog(
-                        context,
-                        "Pengajuan KK Baru",
-                        "Dokumen Tidak Lengkap",
-                        "DITOLAK",
-                        "16:45 WIB",
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Item 4: Laporan Jalan Rusak (Selesai/Berhasil)
-                    _buildActivityCard(
-                      icon: Icons.campaign,
-                      iconColor: const Color(0xFFF97316),
-                      iconBg: const Color(0xFFFFF7ED),
-                      title: "Laporan Jalan Rusak",
-                      subtitle: "Pengaduan Masyarakat",
-                      status: "SELESAI",
-                      statusColor: colorSuccess,
-                      statusBg: bgSuccess,
-                      time: "10:20 WIB",
-                      actionText: "LIHAT TANGGAPAN",
-                      onTap: () => _showDetailDialog(
-                        context,
-                        "Laporan Jalan Rusak",
-                        "Pengaduan Masyarakat",
-                        "SELESAI",
-                        "10:20 WIB",
-                      ),
-                    ),
-                  ],
-                ),
+                       return Padding(
+                         padding: const EdgeInsets.only(bottom: 16),
+                         child: _buildActivityCard(
+                           icon: IconData(item.iconCodePoint, fontFamily: item.iconFontFamily),
+                           iconColor: item.iconColor,
+                           iconBg: item.iconBgColor,
+                           title: item.title,
+                           subtitle: item.subtitle,
+                           status: item.status,
+                           statusColor: item.statusTextColor,
+                           statusBg: item.statusBgColor,
+                           time: item.date,
+                           actionText: actionText,
+                           actionColor: item.status == "DITOLAK" ? goldColor : primaryRed,
+                           customContent: customContent,
+                           onTap: () => _showDetailDialog(context, item.title, item.subtitle, item.status, item.date),
+                           onActionTap: actionCallback,
+                         ),
+                       );
+                     }).toList(),
+                  );
+                }
               ),
+            ),
           ],
         ),
       ),
