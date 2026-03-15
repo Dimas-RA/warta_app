@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../main/main_view.dart';
+import '../auth/register_view.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -18,21 +19,27 @@ class LoginView extends StatelessWidget {
       body: SingleChildScrollView(
         child: Stack(
           children: [
-            // 1. BACKGROUND MERAH DENGAN LENGKUNGAN (Gradient)
+            // Layer 1: Lengkungan Emas (Sedikit lebih tinggi dari yang merah)
             Container(
-              height:
-                  320, // Dibuat sedikit lebih tinggi agar tertutup kotak putih
+              height: 325,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: goldColor, // Warna emas
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.elliptical(400, 80),
+                ),
+              ),
+            ),
+            // Layer 2: Lengkungan Merah
+            Container(
+              height: 320,
               width: double.infinity,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF8B0000), // Merah atas
-                    Color(0xFF660000), // Merah bawah
-                  ],
+                  colors: [Color(0xFF8B0000), Color(0xFF660000)],
                 ),
-                // Membuat efek lengkungan elips di bawah
                 borderRadius: BorderRadius.vertical(
                   bottom: Radius.elliptical(400, 80),
                 ),
@@ -207,7 +214,15 @@ class LoginView extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          // Pindah ke halaman utama (ganti MainNavigationPage dengan nama class Navbar kamu)
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RegisterView(),
+                            ),
+                          );
+                        },
                         child: const Text(
                           "SCAN KTP UNTUK DAFTAR",
                           style: TextStyle(
