@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../utils/top_notification.dart';
 import '../../services/media_service.dart';
 import '../../services/ocr_service.dart';
@@ -44,13 +44,13 @@ class _ProfilDetailViewState extends State<ProfilDetailView> {
   Future<void> _scanKtp() async {
     setState(() => _isScanningKtp = true);
     
-    // 1. Buka Kamera
-    final File? image = await _mediaService.pickImageFromCamera();
-    if (image != null) {
-      // 2. Proses OCR
-      final String? text = await _ocrService.processImage(image);
+    // 1. Buka Kamera (XFile untuk OCR, support content URIs)
+    final XFile? xfile = await _mediaService.pickImageXFileFromCamera();
+    if (xfile != null) {
+      // 2. Proses OCR via XFile
+      final String? text = await _ocrService.processImage(xfile);
       
-      if (text != null && text.isNotEmpty) {
+      if (text != null && text.isNotEmpty && !text.startsWith('__ERROR__:')) {
         // Cari urutan 16 digit angka yang kemungkinan besar NIK
         final RegExp nikRegex = RegExp(r'\b\d{16}\b');
         final match = nikRegex.firstMatch(text);
