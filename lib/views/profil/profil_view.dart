@@ -5,8 +5,9 @@ import 'iuran_view.dart';
 import 'jadwal_ronda_view.dart';
 import 'bantuan_view.dart';
 import 'dart:ui';
-import '../../models/profil_model.dart';
-import '../../services/profil_service.dart';
+import 'package:provider/provider.dart';
+import '../../viewmodels/auth_viewmodel.dart';
+import '../auth/auth_gate.dart';
 
 const Color primaryRed = Color(0xFF8B0000);
 const Color bgApp = Color(0xFFF8F9FA);
@@ -114,28 +115,20 @@ class _ProfilViewState extends State<ProfilView> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<UserModel>(
-      future: UserService().getUserProfile(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            backgroundColor: bgApp,
-            body: Center(child: CircularProgressIndicator(color: primaryRed)),
-          );
-        }
-        
-        final user = snapshot.data;
-        if (user == null) {
-          return const Scaffold(
-             backgroundColor: bgApp,
-             body: Center(child: Text("Data pengguna tidak ditemukan.")),
-          );
-        }
+    final authVM = context.watch<AuthViewModel>();
+    final user = authVM.currentUser;
 
-        return Scaffold(
-          backgroundColor: bgApp,
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 60),
+    if (user == null) {
+      return const Scaffold(
+        backgroundColor: bgApp,
+        body: Center(child: Text("Data pengguna tidak ditemukan.")),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: bgApp,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 60),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -297,14 +290,6 @@ class _ProfilViewState extends State<ProfilView> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "NIK: ${user.nik.replaceRange(4, 12, '********')}",
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 12,
-                            ),
-                          ),
                           const SizedBox(height: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -440,7 +425,7 @@ class _ProfilViewState extends State<ProfilView> {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                user.domisili.toUpperCase(),
+                                "RT ${user.rt ?? '-'} / RW ${user.rw ?? '-'}",
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 8,
@@ -473,8 +458,8 @@ class _ProfilViewState extends State<ProfilView> {
                               children: [
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    Text(
+                                  children: [
+                                    const Text(
                                       "TEMPAT/TGL LAHIR",
                                       style: TextStyle(
                                         color: Colors.white70,
@@ -482,8 +467,8 @@ class _ProfilViewState extends State<ProfilView> {
                                       ),
                                     ),
                                     Text(
-                                      "JAKARTA, 24-09-1991",
-                                      style: TextStyle(
+                                      "${(user.tempatLahir ?? '-').toUpperCase()}, ${user.tanggalLahir ?? '-'}",
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,
@@ -494,8 +479,8 @@ class _ProfilViewState extends State<ProfilView> {
                                 const SizedBox(width: 16),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    Text(
+                                  children: [
+                                    const Text(
                                       "JENIS KELAMIN",
                                       style: TextStyle(
                                         color: Colors.white70,
@@ -503,8 +488,8 @@ class _ProfilViewState extends State<ProfilView> {
                                       ),
                                     ),
                                     Text(
-                                      "LAKI-LAKI",
-                                      style: TextStyle(
+                                      (user.jenisKelamin ?? '-').toUpperCase(),
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,
@@ -728,6 +713,61 @@ class _ProfilViewState extends State<ProfilView> {
                               },
                             ),
                             const Divider(height: 1, color: borderColor),
+                            
+                            // ROLE SWITCHER (PETUGAS)
+                            if (user.role != 'warga') ...[
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const AuthGate()),
+                                    (route) => false,
+                                  );
+                                },
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  margin: const EdgeInsets.all(16),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFF1F2937), Color(0xFF374151)],
+                                    ),
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.1),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.admin_panel_settings, color: Colors.white, size: 28),
+                                      SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Kembali ke Panel Aparatur",
+                                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                                            ),
+                                            Text(
+                                              "Tutup mode penduduk reguler.",
+                                              style: TextStyle(color: Colors.grey, fontSize: 10),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Icon(Icons.chevron_right, color: Colors.white),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const Divider(height: 1, color: borderColor),
+                            ],
+
                             _buildMenuItem(
                               Icons.logout,
                               "Keluar dari Aplikasi",
@@ -831,14 +871,20 @@ class _ProfilViewState extends State<ProfilView> {
                                                           vertical: 12,
                                                         ),
                                                   ),
-                                                  onPressed: () {
-                                                    Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            const LoginView(),
-                                                      ),
-                                                    );
+                                                  onPressed: () async {
+                                                    final authVM = context.read<AuthViewModel>();
+                                                    await authVM.logout();
+                                                    
+                                                    if (context.mounted) {
+                                                      Navigator.pushAndRemoveUntil(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              const AuthGate(),
+                                                        ),
+                                                        (route) => false,
+                                                      );
+                                                    }
                                                   },
                                                   child: const Text(
                                                     "KELUAR",
@@ -885,8 +931,6 @@ class _ProfilViewState extends State<ProfilView> {
           ],
         ),
       ),
-    );
-      }
     );
   }
 

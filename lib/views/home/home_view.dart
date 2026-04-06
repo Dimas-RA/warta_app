@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../viewmodels/auth_viewmodel.dart';
 import '../report/lapor_view.dart';
 import '../darurat/darurat_view.dart';
 import '../berita/berita_view.dart';
@@ -29,6 +31,19 @@ class _HomeViewState extends State<HomeView> {
   static const Color textDark = Color(0xFF1F2937);
   static const Color textGray = Color(0xFF6B7280);
   static const Color goldColor = Color(0xFFD4AF37);
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return "Selamat Pagi,";
+    } else if (hour < 15) {
+      return "Selamat Siang,";
+    } else if (hour < 18) {
+      return "Selamat Sore,";
+    } else {
+      return "Selamat Malam,";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,19 +116,24 @@ class _HomeViewState extends State<HomeView> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Selamat Pagi,",
+                                    _getGreeting(),
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.7),
+                                      color: Colors.white.withValues(alpha: 0.7),
                                       fontSize: 14,
                                     ),
                                   ),
-                                  const Text(
-                                    "Budi Setiawan",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  Consumer<AuthViewModel>(
+                                    builder: (context, authVM, child) {
+                                      final nama = authVM.currentUser?.nama ?? "Budi Setiawan";
+                                      return Text(
+                                        nama,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ],
                               ),

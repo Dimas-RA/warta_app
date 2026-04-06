@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:provider/provider.dart';
+import '../../viewmodels/auth_viewmodel.dart';
 import 'photo_verif_view.dart';
 
 class FormRegistView extends StatefulWidget {
@@ -42,6 +44,10 @@ class _FormRegistViewState extends State<FormRegistView> {
   late final TextEditingController _kelCtrl;
   late final TextEditingController _kecCtrl;
   late final TextEditingController _kabCtrl;
+  // Akun
+  late final TextEditingController _emailCtrl;
+  late final TextEditingController _passwordCtrl;
+  late final TextEditingController _confirmPasswordCtrl;
 
   String _jenisKelamin = '-';
   String _statusPerkawinan = '-';
@@ -68,6 +74,9 @@ class _FormRegistViewState extends State<FormRegistView> {
     _kelCtrl = TextEditingController(text: d['kelurahan'] ?? '');
     _kecCtrl = TextEditingController(text: d['kecamatan'] ?? '');
     _kabCtrl = TextEditingController(text: d['kabupaten'] ?? '');
+    _emailCtrl = TextEditingController();
+    _passwordCtrl = TextEditingController();
+    _confirmPasswordCtrl = TextEditingController();
 
     // Dropdown values — validate against allowed options
     const allowedJK = ['LAKI-LAKI', 'PEREMPUAN'];
@@ -95,6 +104,9 @@ class _FormRegistViewState extends State<FormRegistView> {
     _kelCtrl.dispose();
     _kecCtrl.dispose();
     _kabCtrl.dispose();
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    _confirmPasswordCtrl.dispose();
     super.dispose();
   }
 
@@ -367,7 +379,7 @@ class _FormRegistViewState extends State<FormRegistView> {
                   _buildSectionHeader(Icons.fingerprint, "IDENTITAS UTAMA"),
                   _buildTextField("NIK", "", controller: _nikCtrl),
                   const SizedBox(height: 16),
-                  _buildTextField("NAMA LENGKAP", "", controller: _namaCtrl),
+                  _buildTextField("NAMA LENGKAP", "", controller: _namaCtrl, isUpperCase: true),
                   // Hint kecil di bawah nama
                   const Padding(
                     padding: EdgeInsets.only(top: 4, left: 4),
@@ -519,11 +531,13 @@ class _FormRegistViewState extends State<FormRegistView> {
                     Icons.account_circle_outlined,
                     "DATA AKUN",
                   ),
-                  _buildTextField("EMAIL", ""),
+                  _buildTextField("EMAIL", "", controller: _emailCtrl,
+                    keyboardType: TextInputType.emailAddress),
                   const SizedBox(height: 16),
                   _buildTextField(
                     "BUAT PASSWORD",
                     "",
+                    controller: _passwordCtrl,
                     isPassword: true,
                     isObscure: _obscurePassword,
                     onToggleObscure: () {
@@ -536,6 +550,7 @@ class _FormRegistViewState extends State<FormRegistView> {
                   _buildTextField(
                     "KONFIRMASI PASSWORD",
                     "",
+                    controller: _confirmPasswordCtrl,
                     isPassword: true,
                     isObscure: _obscureConfirmPassword,
                     onToggleObscure: () {
@@ -548,39 +563,53 @@ class _FormRegistViewState extends State<FormRegistView> {
                   const SizedBox(height: 40),
 
                   // --- TOMBOL SIMPAN ---
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryRed,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 4,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const PhotoVerifView(),
+                  Consumer<AuthViewModel>(
+                    builder: (context, authVM, _) {
+                      return Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            height: 56,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryRed,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 4,
+                              ),
+                              onPressed: authVM.isLoading
+                                  ? null
+                                  : () => _simpanDanLanjut(authVM),
+                              icon: authVM.isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.verified_user_outlined,
+                                      color: Colors.white,
+                                    ),
+                              label: Text(
+                                authVM.isLoading
+                                    ? "MEMPROSES..."
+                                    : "SIMPAN & LANJUT",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ),
                           ),
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.verified_user_outlined,
-                        color: Colors.white,
-                      ),
-                      label: const Text(
-                        "SIMPAN & LANJUT",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
+                        ],
+                      );
+                    },
                   ),
                   const SizedBox(height: 16),
                   const Center(
@@ -596,6 +625,81 @@ class _FormRegistViewState extends State<FormRegistView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // ==========================================
+  // LOGIKA REGISTRASI
+  // ==========================================
+
+  Future<void> _simpanDanLanjut(AuthViewModel authVM) async {
+    // Validasi field wajib
+    if (_nikCtrl.text.trim().isEmpty || _namaCtrl.text.trim().isEmpty) {
+      _showSnackbar('NIK dan Nama tidak boleh kosong.');
+      return;
+    }
+    if (_emailCtrl.text.trim().isEmpty) {
+      _showSnackbar('Email tidak boleh kosong.');
+      return;
+    }
+    if (_passwordCtrl.text.length < 6) {
+      _showSnackbar('Password minimal 6 karakter.');
+      return;
+    }
+    if (_passwordCtrl.text != _confirmPasswordCtrl.text) {
+      _showSnackbar('Password dan konfirmasi password tidak cocok.');
+      return;
+    }
+
+    // Kumpulkan data KTP dari controllers
+    final ktpData = {
+      'nik': _nikCtrl.text.trim(),
+      'nama': _namaCtrl.text.trim().toUpperCase(),
+      'tempat_lahir': _tempatLahirCtrl.text.trim(),
+      'tanggal_lahir': _tglLahirCtrl.text.trim(),
+      'jenis_kelamin': _jenisKelamin,
+      'gol_darah': _golDarahCtrl.text.trim(),
+      'agama': _agamaCtrl.text.trim(),
+      'status_perkawinan': _statusPerkawinan,
+      'pekerjaan': _pekerjaanCtrl.text.trim(),
+      'kewarganegaraan': _kewarganegaraanCtrl.text.trim(),
+      'alamat': _alamatCtrl.text.trim(),
+      'rt': _rtCtrl.text.trim(),
+      'rw': _rwCtrl.text.trim(),
+      'kelurahan': _kelCtrl.text.trim(),
+      'kecamatan': _kecCtrl.text.trim(),
+      'kabupaten': _kabCtrl.text.trim(),
+    };
+
+    final success = await authVM.registerStep1(
+      email: _emailCtrl.text.trim(),
+      password: _passwordCtrl.text,
+      ktpData: ktpData,
+      ktpImageFile: widget.ktpImageFile,
+    );
+
+    if (!mounted) return;
+    if (success) {
+      // Lanjut ke upload selfie
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PhotoVerifView(pendingUid: authVM.pendingUid),
+        ),
+      );
+    } else {
+      _showSnackbar(authVM.errorMessage ?? 'Registrasi gagal. Coba lagi.');
+    }
+  }
+
+  void _showSnackbar(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: const Color(0xFF8B0000),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -642,12 +746,16 @@ class _FormRegistViewState extends State<FormRegistView> {
     VoidCallback? onToggleObscure,
     TextEditingController? controller,
     Widget? suffixIcon,
+    TextInputType? keyboardType,
+    bool isUpperCase = false,
   }) {
     return TextFormField(
       controller: controller,
       initialValue: controller == null ? initialValue : null,
       maxLines: maxLines,
       obscureText: isObscure ?? false,
+      keyboardType: keyboardType,
+      textCapitalization: isUpperCase ? TextCapitalization.characters : TextCapitalization.none,
       style: const TextStyle(color: textDark, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,

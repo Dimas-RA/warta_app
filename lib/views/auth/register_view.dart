@@ -1026,6 +1026,44 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
               ),
             ),
+            const SizedBox(height: 12),
+
+            // 🐛 DEBUG: Tombol skip scan KTP (hapus sebelum release)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.orange, width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const FormRegistView(
+                          prefilledData: {},
+                          ktpImageFile: null,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.bug_report_outlined, color: Colors.orange, size: 18),
+                  label: const Text(
+                    "SKIP SCAN KTP (DEBUG)",
+                    style: TextStyle(
+                      color: Colors.orange,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
           ],
         ),
