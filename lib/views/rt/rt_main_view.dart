@@ -3,6 +3,7 @@ import 'rt_home_view.dart';
 import 'rt_manajemen_view.dart';
 import 'rt_approval_view.dart';
 import 'rt_profil_view.dart';
+import 'rt_scanner_view.dart';
 
 class RtMainView extends StatefulWidget {
   final int initialIndex;
@@ -35,74 +36,6 @@ class _RtMainViewState extends State<RtMainView> {
     });
   }
 
-  void _showScannerDummy() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.7,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 16),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const Text(
-                "Scan QR Code Warga",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F2937),
-                ),
-              ),
-              const SizedBox(height: 32),
-              // Kotak dummy scanner
-              Container(
-                width: 250,
-                height: 250,
-                decoration: BoxDecoration(
-                  color: Colors.black87,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF8B0000), width: 3),
-                ),
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.qr_code_scanner, color: Colors.white, size: 60),
-                      SizedBox(height: 16),
-                      Text("Kamera Aktif\nArahkan ke QR Code", textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 40),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32),
-                child: Text(
-                  "Fitur untuk memvalidasi KTP Digital atau Kehadiran Ronda Warga secara cepat.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +45,12 @@ class _RtMainViewState extends State<RtMainView> {
       ),
       // Tombol Scan Floating
       floatingActionButton: FloatingActionButton(
-        onPressed: _showScannerDummy,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const RtScannerView()),
+          );
+        },
         backgroundColor: const Color(0xFFD4AF37), // Emas
         shape: const CircleBorder(),
         elevation: 4,

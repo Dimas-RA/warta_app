@@ -13,6 +13,7 @@ import '../../services/berita_service.dart';
 import '../../services/berita_api_service.dart';
 import '../../models/aktivitas_model.dart';
 import '../../services/aktivitas_service.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class HomeView extends StatefulWidget {
   final Function(int) onNavigate;
@@ -713,6 +714,9 @@ class _HomeViewState extends State<HomeView> {
   }
 
   void _showQrDialog(BuildContext context) {
+    final authVM = Provider.of<AuthViewModel>(context, listen: false);
+    final uid = authVM.currentUser?.uid ?? 'UNKNOWN_USER';
+
     showDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.1),
@@ -763,10 +767,10 @@ class _HomeViewState extends State<HomeView> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Icon(
-                      Icons.qr_code_2,
-                      size: 160,
-                      color: Colors.black87,
+                    child: QrImageView(
+                      data: uid,
+                      version: QrVersions.auto,
+                      size: 160.0,
                     ),
                   ),
                   const SizedBox(height: 24),

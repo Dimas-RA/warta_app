@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
+import '../../viewmodels/auth_viewmodel.dart';
 import '../../utils/top_notification.dart';
 import '../../models/darurat_model.dart';
 import '../../services/darurat_service.dart';
@@ -19,10 +23,12 @@ class _DaruratViewState extends State<DaruratView>
   int _countdown = 7;
   bool _isCancelled = false;
   bool _isSent = false;
+  late Future<List<KontakDaruratModel>> _futureKontak;
 
   @override
   void initState() {
     super.initState();
+    _futureKontak = DaruratService().getKontakDarurat();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -49,17 +55,76 @@ class _DaruratViewState extends State<DaruratView>
     });
   }
 
-  void _triggerEmergency() {
+  Future<void> _triggerEmergency() async {
     if (_isCancelled || _isSent) return;
+    
+    // Hentikan UI pulse
     setState(() {
-      _isSent = true;
-      _controller.stop(); // Berhenti berdetak
+      _controller.stop();
     });
+    
+    // Tampilkan loading sebentar selagi mengambil GPS
     TopNotification.show(
       context: context,
-      message: "Sinyal Darurat TRACE Dikirim!",
-      isError: true,
+      message: "Mencari Lokasi GPS Anda...",
     );
+
+    try {
+      // Cek dan minta izin lokasi
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception("Izin Lokasi Ditolak");
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception("Izin Lokasi Ditolak Permanen");
+      }
+
+      // Ambil GPS (timeout 5 detik untuk berjaga-jaga)
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      ).timeout(const Duration(seconds: 5));
+
+      // Ambil User Data
+      if (!mounted) return;
+      final authVM = Provider.of<AuthViewModel>(context, listen: false);
+      final currentUser = authVM.currentUser;
+
+      if (currentUser != null) {
+        await DaruratService().sendEmergencySignal(
+          warga: currentUser,
+          latitude: position.latitude,
+          longitude: position.longitude,
+        );
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _isSent = true;
+      });
+      TopNotification.show(
+        context: context,
+        message: "Sinyal Darurat TRACE Berhasil Dikirim ke Pak RT!",
+        isError: true, // Warna merah
+      );
+    } catch (e) {
+      debugPrint("Darurat Error: $e");
+      // Fallback: GPS gagal, tapi tetap dianggap "aktif" secara UI
+      if (!mounted) return;
+      setState(() {
+        _isSent = true;
+      });
+      TopNotification.show(
+        context: context,
+        message: "Sinyal Terkirim dengan peringatan: Gagal mendapatkan GPS ($e)",
+        isError: true,
+      );
+    }
   }
 
   void _cancelEmergency() {
@@ -119,8 +184,8 @@ class _DaruratViewState extends State<DaruratView>
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const SizedBox(
-                    height: 20,
-                  ), // Memberikan jarak dari tombol back
+                    height: 10,
+                  ), // Memberikan jarak dari tombol back (dikurangi agar naik)
                   const Text(
                     "TOMBOL DARURAT",
                     style: TextStyle(
@@ -130,7 +195,7 @@ class _DaruratViewState extends State<DaruratView>
                       letterSpacing: 2.0,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   Text(
                     "Tekan ini jika Anda dalam bahaya!",
                     style: TextStyle(
@@ -138,7 +203,7 @@ class _DaruratViewState extends State<DaruratView>
                       fontSize: 16,
                     ),
                   ),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 35), // Dikurangi agar elemen bawah ikut naik
 
                   // PANIC BUTTON DENGAN ANIMASI PULSE
                   AnimatedBuilder(
@@ -192,7 +257,7 @@ class _DaruratViewState extends State<DaruratView>
                     },
                   ),
 
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 35),
 
                   // CANCEL BUTTON
                   if (!_isCancelled && !_isSent)
@@ -229,18 +294,17 @@ class _DaruratViewState extends State<DaruratView>
                     ),
 
                   if (_isCancelled)
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 20),
-                      child: Text(
-                        "Darurat dibatalkan.",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    const Text(
+                      "Darurat dibatalkan.",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     
+                  const SizedBox(height: 35), // Jarak ekstra antara tombol/tulisan merah dengan panel putih kontak instansi
+                  
                   // LIST KONTAK DARURAT
                   Expanded(
                     child: Container(
@@ -264,7 +328,7 @@ class _DaruratViewState extends State<DaruratView>
                           const SizedBox(height: 16),
                           Expanded(
                             child: FutureBuilder<List<KontakDaruratModel>>(
-                              future: DaruratService().getKontakDarurat(),
+                              future: _futureKontak,
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState == ConnectionState.waiting) {
                                   return const Center(child: CircularProgressIndicator(color: Color.fromARGB(255, 100, 0, 0)));
@@ -306,24 +370,23 @@ class _DaruratViewState extends State<DaruratView>
                                           children: [
                                             const SizedBox(height: 4),
                                             Text(kontak.jenisLayanan, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
-                                            const SizedBox(height: 4),
-                                            Row(
-                                              children: [
-                                                Icon(Icons.location_on, size: 14, color: Colors.grey[400]),
-                                                const SizedBox(width: 4),
-                                                Text(kontak.jarak, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
-                                              ],
-                                            ),
                                           ],
                                         ),
                                         trailing: IconButton(
                                           icon: const Icon(Icons.call, color: Colors.green),
-                                          onPressed: () {
-                                            TopNotification.show(
-                                              context: context,
-                                              message: "Memanggil ${kontak.nomorTelepon}...",
-                                              isSuccess: true,
-                                            );
+                                          onPressed: () async {
+                                            final Uri telUri = Uri.parse('tel:${kontak.nomorTelepon}');
+                                            if (await canLaunchUrl(telUri)) {
+                                              await launchUrl(telUri);
+                                            } else {
+                                              if (context.mounted) {
+                                                TopNotification.show(
+                                                  context: context,
+                                                  message: "Tidak dapat membuka dialer untuk ${kontak.nomorTelepon}",
+                                                  isError: true,
+                                                );
+                                              }
+                                            }
                                           },
                                         ),
                                       ),

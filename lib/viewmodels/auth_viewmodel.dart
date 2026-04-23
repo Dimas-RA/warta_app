@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
+import '../services/media_service.dart';
 
 /// ViewModel untuk semua operasi autentikasi.
 /// Digunakan via Provider di seluruh app.
@@ -28,16 +30,11 @@ class AuthViewModel extends ChangeNotifier {
   // ================================================================
 
   /// Login user. Returns true jika berhasil.
-  Future<bool> login(String email, String password, {bool enableBiometric = false}) async {
+  Future<bool> login(String email, String password) async {
     _setLoading(true);
     _clearError();
     try {
       _currentUser = await _authService.signIn(email, password);
-      
-      // Simpan kredensial untuk biometric jika diizinkan
-      if (enableBiometric) {
-        await _authService.saveBiometricCredentials(email, password);
-      }
       
       notifyListeners();
       return true;
@@ -51,8 +48,16 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   // ================================================================
-  // BIOMETRIC & LUPA PASSWORD
+  // BIOMETRIC, LUPA PASSWORD & REMEMBER ME
   // ================================================================
+
+  Future<void> saveRememberMe(String email, bool isRemembered) async {
+    await _authService.saveRememberMe(email, isRemembered);
+  }
+
+  Future<Map<String, dynamic>> getRememberMe() async {
+    return await _authService.getRememberMe();
+  }
 
   /// Reset Password by Email
   Future<bool> resetPassword(String email) async {
@@ -61,6 +66,34 @@ class AuthViewModel extends ChangeNotifier {
     try {
       if (email.isEmpty) throw Exception("Email tidak boleh kosong");
       await _authService.resetPassword(email);
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Cek status aktif biometrik
+  Future<bool> isBiometricEnabled() async {
+    return await _authService.isBiometricEnabled();
+  }
+
+  /// Mematikan fitur biometrik
+  Future<void> disableBiometric() async {
+    await _authService.disableBiometric();
+    notifyListeners();
+  }
+
+  /// Menghidupkan fitur biometrik (Hanya dapat dipanggil jika user sdh Login & memasukkan sandi untuk konfirmasi)
+  Future<bool> enableBiometricWithReauth(String password) async {
+    _setLoading(true);
+    _clearError();
+    try {
+      if (_currentUser == null) throw Exception("Tidak ada user aktif");
+      await _authService.saveBiometricCredentials(_currentUser!.email, password);
       return true;
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
@@ -184,6 +217,50 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('[AuthViewModel] Gagal load user: $e');
+    }
+  }
+
+  // ================================================================
+  // UPDATE FOTO PROFIL
+  // ================================================================
+
+  /// Pilih foto dari galeri atau kamera lalu upload ke Cloudinary.
+  /// Menyimpan URL baru di Firestore dan memperbarui currentUser.
+  /// [fromCamera] = true → kamera, false → galeri.
+  /// Returns true jika berhasil.
+  Future<bool> updateProfilePhoto({bool fromCamera = false}) async {
+    if (_currentUser == null) {
+      _errorMessage = 'Tidak ada pengguna aktif.';
+      notifyListeners();
+      return false;
+    }
+
+    _setLoading(true);
+    _clearError();
+    try {
+      final mediaService = MediaService();
+      final XFile? xFile = fromCamera
+          ? await mediaService.pickImageXFileFromCamera()
+          : await mediaService.pickImageXFileFromGallery();
+
+      if (xFile == null) {
+        // User batal memilih gambar
+        return false;
+      }
+
+      final updatedUser = await _authService.updateProfilePhoto(
+        _currentUser!.uid,
+        xFile,
+      );
+      _currentUser = updatedUser;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+      return false;
+    } finally {
+      _setLoading(false);
     }
   }
 

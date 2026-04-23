@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import 'package:intl/intl.dart';
+import '../../models/darurat_model.dart';
+import '../../services/darurat_service.dart';
+import '../darurat/darurat_rt_action_view.dart';
 
 class RtHomeView extends StatefulWidget {
   final Function(int) onNavigate;
@@ -33,12 +36,108 @@ class _RtHomeViewState extends State<RtHomeView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- BANNER DARURAT TRACE ---
+            Consumer<AuthViewModel>(
+              builder: (context, authVM, _) {
+                final String rtId = authVM.currentUser?.rt ?? '';
+                if (rtId.isEmpty) return const SizedBox.shrink();
+
+                return StreamBuilder<List<EmergencySignalModel>>(
+                  stream: DaruratService().streamActiveEmergencies(rtId),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+
+                    // Terdapat Darurat Aktif
+                    final activeList = snapshot.data!;
+                    final emergency = activeList.first; // Ambil darurat pertama yang masuk
+
+                    return GestureDetector(
+                      onTap: () {
+                        DaruratActionModal.show(context, emergency);
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        margin: EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          top: MediaQuery.of(context).padding.top + 10,
+                          bottom: 10,
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFE53935), Color(0xFFC62828)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFD32F2F).withValues(alpha: 0.4),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 28),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "🚨 DARURAT (TRACE)",
+                                    style: TextStyle(
+                                      color: Colors.white, 
+                                      fontWeight: FontWeight.w800, 
+                                      fontSize: 15,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "${emergency.namaWarga} menekan tombol bahaya!",
+                                    style: TextStyle(color: Colors.white.withValues(alpha: 0.95), fontSize: 13),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    "Ketuk untuk rincian & tindakan",
+                                    style: TextStyle(
+                                      color: Color(0xFFFFD54F), // Kuning gold
+                                      fontSize: 12, 
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right, color: Colors.white70),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+
             // --- HEADER MELENGKUNG (SAMA SEPERTI WARGA) ---
             Stack(
               clipBehavior: Clip.none,
               children: [
                 Container(
-                  height: 250,
+                  height: 280,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
@@ -87,7 +186,7 @@ class _RtHomeViewState extends State<RtHomeView> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 60, 24, 0),
+                          padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -241,7 +340,7 @@ class _RtHomeViewState extends State<RtHomeView> {
               ],
             ),
             
-            const SizedBox(height: 70),
+            const SizedBox(height: 50),
 
             // --- TABEL DATA TERBARU ---
             Padding(

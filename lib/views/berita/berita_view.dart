@@ -29,7 +29,7 @@ class _BeritaViewState extends State<BeritaView> {
 
   Future<List<BeritaModel>> _loadBerita({String? query}) async {
     // Try real API first
-    final apiResult = await _apiService.getBeritaList(query: query ?? 'pemerintah daerah indonesia');
+    final apiResult = await _apiService.getBeritaList(query: query ?? '');
     if (apiResult.isNotEmpty) {
       if (mounted) setState(() => _dataSource = 'live');
       return apiResult;

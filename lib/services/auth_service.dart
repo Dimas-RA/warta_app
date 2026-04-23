@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:local_auth/local_auth.dart';
 import '../models/user_model.dart';
 import 'cloudinary_service.dart';
@@ -20,6 +21,19 @@ class AuthService {
 
   /// User Firebase saat ini
   User? get currentFirebaseUser => _auth.currentUser;
+
+  /// Mengambil data user apa pun berdasarkan UID (berguna untuk Scanner RT)
+  Future<UserModel?> getUserByUid(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists) {
+        return UserModel.fromFirestore(doc);
+      }
+    } catch (e) {
+      debugPrint("Error getUserByUid: $e");
+    }
+    return null;
+  }
 
   // ================================================================
   // SIGN IN
@@ -150,6 +164,36 @@ class AuthService {
     debugPrint('[AuthService] Selfie URL: $selfieUrl');
   }
 
+  /// Ganti foto profil user (setelah login).
+  /// Upload ke Cloudinary folder 'profile_photos/' lalu update Firestore.
+  /// Returns UserModel terbaru jika berhasil, throws Exception jika gagal.
+  Future<UserModel> updateProfilePhoto(String uid, XFile imageFile) async {
+    debugPrint('[AuthService] Mulai update foto profil uid=$uid');
+
+    // Menggunakan folder 'selfies' seperti saat register, atau 'warta' agar tak ditolak permission unsigned
+    final photoUrl = await _cloudinary.uploadImageXFile(
+      imageFile,
+      folder: 'selfies',
+    );
+
+    if (photoUrl == null) {
+      throw Exception('Gagal mengupload foto. Periksa koneksi internet Anda.');
+    }
+
+    await _firestore.collection('users').doc(uid).update({
+      'selfieUrl': photoUrl,
+    });
+
+    debugPrint('[AuthService] Foto profil terupdate: $photoUrl');
+
+    // Ambil data user terbaru dari Firestore
+    final updatedUser = await getUserById(uid);
+    if (updatedUser == null) {
+      throw Exception('Gagal memuat ulang data pengguna.');
+    }
+    return updatedUser;
+  }
+
   // ================================================================
   // SIGN OUT
   // ================================================================
@@ -159,8 +203,29 @@ class AuthService {
   }
 
   // ================================================================
-  // LUPA PASSWORD & BIOMETRIK
+  // LUPA PASSWORD, BIOMETRIK, & REMEMBER ME
   // ================================================================
+
+  /// Menyimpan status Remember Me (untuk form input Login)
+  Future<void> saveRememberMe(String email, bool isRemembered) async {
+    if (isRemembered) {
+      await _secureStorage.write(key: 'remember_me_email', value: email);
+      await _secureStorage.write(key: 'remember_me_enabled', value: 'true');
+    } else {
+      await _secureStorage.delete(key: 'remember_me_email');
+      await _secureStorage.delete(key: 'remember_me_enabled');
+    }
+  }
+
+  /// Membaca info Remember Me
+  Future<Map<String, dynamic>> getRememberMe() async {
+    final enabled = await _secureStorage.read(key: 'remember_me_enabled');
+    final email = await _secureStorage.read(key: 'remember_me_email');
+    return {
+      'isEnabled': enabled == 'true',
+      'email': email ?? '',
+    };
+  }
 
   /// Kirim email reset password
   Future<void> resetPassword(String email) async {
@@ -171,8 +236,44 @@ class AuthService {
     }
   }
 
-  /// Aktifkan login biometrik dengan menyimpan kredensial ke secure storage
+  /// Membaca apakah biometrik menyala
+  Future<bool> isBiometricEnabled() async {
+    final status = await _secureStorage.read(key: 'bio_enabled');
+    return status == 'true';
+  }
+
+  /// Mematikan fitur biometrik dari profil
+  Future<void> disableBiometric() async {
+    await _secureStorage.delete(key: 'bio_email');
+    await _secureStorage.delete(key: 'bio_password');
+    await _secureStorage.delete(key: 'bio_enabled');
+  }
+
+  /// Aktifkan login biometrik (Hanya dipanggil setelah re-Auth password di menu Profil)
   Future<void> saveBiometricCredentials(String email, String password) async {
+    // Mencoba SignIn ulang untuk ngetest apa passwordnya bener sebelum disave!
+    try {
+      await signIn(email, password);
+    } catch (e) {
+      throw Exception("Kata sandi yang Anda masukkan salah.");
+    }
+    
+    // Verifikasi pemindai fingerprint asli android
+    final canCheckBiometrics = await _localAuth.canCheckBiometrics;
+    final isDeviceSupported = await _localAuth.isDeviceSupported();
+
+    if (!canCheckBiometrics || !isDeviceSupported) {
+      throw Exception("Perangkat ini tidak mendukung fitur Biometrik.");
+    }
+
+    final authenticated = await _localAuth.authenticate(
+      localizedReason: "Pindai biometrik untuk mengaktifkan fitur ini",
+    );
+
+    if (!authenticated) {
+      throw Exception("Registrasi biometrik dibatalkan sistem.");
+    }
+
     await _secureStorage.write(key: 'bio_email', value: email);
     await _secureStorage.write(key: 'bio_password', value: password);
     await _secureStorage.write(key: 'bio_enabled', value: 'true');
@@ -183,7 +284,7 @@ class AuthService {
     try {
       final isBiometricEnabled = await _secureStorage.read(key: 'bio_enabled');
       if (isBiometricEnabled != 'true') {
-        throw Exception("Biometrik belum diaktifkan. Silakan login manual dan centang opsi 'Gunakan Biometrik'.");
+        throw Exception("Biometrik belum diaktifkan. Silakan aktifkan dari Menu Profil Anda.");
       }
 
       final canCheckBiometrics = await _localAuth.canCheckBiometrics;

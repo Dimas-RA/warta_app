@@ -13,7 +13,7 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   bool _obscurePassword = true;
-  bool _enableBiometric = true;
+  bool _rememberMe = false;
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
 
@@ -23,6 +23,27 @@ class _LoginViewState extends State<LoginView> {
   static const Color textGray = Color(0xFF6B7280);
   static const Color borderColor = Color(0xFFD1D5DB);
   static const Color goldColor = Color(0xFFB8860B);
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadRememberMe();
+    });
+  }
+
+  Future<void> _loadRememberMe() async {
+    final authVM = context.read<AuthViewModel>();
+    final data = await authVM.getRememberMe();
+    if (mounted) {
+      setState(() {
+        _rememberMe = data['isEnabled'] == true;
+        if (_rememberMe) {
+          _emailCtrl.text = data['email'] ?? '';
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -45,10 +66,12 @@ class _LoginViewState extends State<LoginView> {
     }
 
     final authVM = context.read<AuthViewModel>();
-    final success = await authVM.login(loginId, password, enableBiometric: _enableBiometric);
+    final success = await authVM.login(loginId, password);
 
     if (!mounted) return;
-    if (!success) {
+    if (success) {
+      await authVM.saveRememberMe(loginId, _rememberMe);
+    } else {
       _showSnackbar(authVM.errorMessage ?? 'Login gagal.');
     }
   }
@@ -336,7 +359,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         const SizedBox(height: 12),
 
-                        // Opsi Lupa Sandi & Biometrik Aktif
+                        // Opsi Remember Me & Lupa Sandi
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -346,16 +369,16 @@ class _LoginViewState extends State<LoginView> {
                                   height: 24,
                                   width: 24,
                                   child: Checkbox(
-                                    value: _enableBiometric,
+                                    value: _rememberMe,
                                     onChanged: (val) {
-                                      setState(() => _enableBiometric = val ?? true);
+                                      setState(() => _rememberMe = val ?? false);
                                     },
                                     activeColor: primaryRed,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                const Text("Biometrik", style: TextStyle(fontSize: 12, color: textDark)),
+                                const Text("Ingat Saya", style: TextStyle(fontSize: 12, color: textDark)),
                               ],
                             ),
                             TextButton(
