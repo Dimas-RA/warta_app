@@ -7,6 +7,7 @@ class BeritaModel {
   final String content;
   final String imagePath; // local asset path
   final String? imageUrl;  // remote URL from API
+  final String? sourceUrl; // external link to original article
 
   BeritaModel({
     required this.id,
@@ -17,6 +18,7 @@ class BeritaModel {
     required this.content,
     required this.imagePath,
     this.imageUrl,
+    this.sourceUrl,
   });
 
   /// Maps from DetikNews scraper JSON shape
@@ -30,32 +32,39 @@ class BeritaModel {
       content: json['body'] ?? json['judul'] ?? '',
       imagePath: 'assets/images/city_bg.webp',
       imageUrl: json['gambar'],
+      sourceUrl: json['link'],
     );
   }
 
-  /// Maps from NewsData.io JSON shape
-  factory BeritaModel.fromNewsData(Map<String, dynamic> json, String id) {
-    // Safely extract category list (can be null or empty from API)
-    final categoryList = json['category'];
-    String cat = 'Berita';
-    if (categoryList is List && categoryList.isNotEmpty) {
-      cat = categoryList.first?.toString() ?? 'Berita';
+  /// Maps from RSS2JSON shape
+  factory BeritaModel.fromRSS2JSON(Map<String, dynamic> json, String id) {
+    // Extract image from enclosure if available, otherwise from thumbnail
+    String? imageUrl;
+    if (json['enclosure'] != null && json['enclosure']['link'] != null) {
+      imageUrl = json['enclosure']['link'];
+    } else if (json['thumbnail'] != null && json['thumbnail'].toString().isNotEmpty) {
+      imageUrl = json['thumbnail'];
     }
 
-    // Pick the best available content
-    final content = json['full_description'] ??
-        json['description'] ??
-        json['title'] ?? '';
+    // Gunakan content polos jika tersedia, jika tidak fall back ke description 
+    String rawContent = json['content'] ?? json['description'] ?? json['title'] ?? '';
+    String contentClean = rawContent.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+
+    final String link = json['link'] ?? '';
+    if (link.isNotEmpty) {
+      contentClean += '\n\nBaca artikel selengkapnya di:\n$link';
+    }
 
     return BeritaModel(
       id: id,
       title: json['title'] ?? '',
-      category: cat,
-      author: json['source_name'] ?? 'Unknown',
+      category: 'Nasional',
+      author: 'CNN Indonesia',
       date: json['pubDate'] ?? '',
-      content: content.toString().replaceAll(RegExp(r'<[^>]*>'), ''), // strip HTML
+      content: contentClean,
       imagePath: 'assets/images/city_bg.webp',
-      imageUrl: json['image_url'],
+      imageUrl: imageUrl,
+      sourceUrl: link.isNotEmpty ? link : null,
     );
   }
 }

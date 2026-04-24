@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/darurat_model.dart';
+import '../models/user_model.dart';
 
 class DaruratService {
   // Simulating an API call with Future.delayed
@@ -48,5 +50,60 @@ class DaruratService {
         iconFontFamily: Icons.electrical_services.fontFamily!,
       ),
     ];
+  }
+
+  // ==========================================
+  // REAL-TIME FIRESTORE INTEGRATION (TRACE)
+  // ==========================================
+  
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  /// Mengirim sinyal darurat (warga -> firestore)
+  Future<void> sendEmergencySignal({
+    required UserModel warga,
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      await _firestore.collection('emergencies').add({
+        'uid': warga.uid,
+        'namaWarga': warga.nama,
+        'rt': warga.rt ?? '',
+        'rw': warga.rw ?? '',
+        'latitude': latitude,
+        'longitude': longitude,
+        'timestamp': FieldValue.serverTimestamp(),
+        'status': 'active',
+      });
+    } catch (e) {
+      debugPrint("Error sending emergency signal: $e");
+    }
+  }
+
+  /// Pak RT menandai bahwa darurat sudah diatasi / ditangani
+  Future<void> resolveEmergency(String emergencyId) async {
+    try {
+      await _firestore.collection('emergencies').doc(emergencyId).update({
+        'status': 'resolved',
+      });
+    } catch (e) {
+      debugPrint("Error resolving emergency: $e");
+    }
+  }
+
+  /// Dashboard Pak RT mendengarkan sinyal darurat aktif di RT-nya sendiri
+  Stream<List<EmergencySignalModel>> streamActiveEmergencies(String rtId) {
+    if (rtId.isEmpty) return Stream.value([]);
+    
+    return _firestore
+        .collection('emergencies')
+        .where('rt', isEqualTo: rtId)
+        .where('status', isEqualTo: 'active')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => EmergencySignalModel.fromMap(doc.data(), doc.id))
+          .toList();
+    });
   }
 }
